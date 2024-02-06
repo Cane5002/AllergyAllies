@@ -47,7 +47,7 @@ export default function PatientAppointments({navigation}){
     const findPatient = async () => {
       if (email){
         //replace with your IP address, find quickly from "Metro waiting on exp://<ip>:port" under QR code
-        const patientObj = await axios.get(`http://172.20.10.3:5000/api/findPatient/${email}`)
+        const patientObj = await axios.get(process.env.REACT_APP_BACKEND_IP + `api/findPatient/${email}`)
         setPatient(patientObj.data)
       }
     }

@@ -22,7 +22,7 @@ export default function ProviderSignInScreen({navigation}) {
          // this needs to have your ip address for android (probably iOS too). 
          // get ip quickly from "Metro waiting on exp://<ip>:port"
          // for desktop it should be 'http://localhost:5000/auth/'
-         const response = await axios.post('http://localhost:5000/auth/', authData);
+         const response = await axios.post(process.env.REACT_APP_BACKEND_IP + 'auth/', authData);
          console.log(response);
          // response successful
          if (response.status === 200) {
