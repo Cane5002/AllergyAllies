@@ -20,7 +20,7 @@
     "node-schedule": "^2.1.1",
     "nodemon": "^3.0.1",
     "pdfkit-table": "^0.1.99",
-    "sharp": "^0.32.6",
+    "sharp": "^0.33.2",
     "supertest": "^6.3.3"
   },
   "devDependencies": {
