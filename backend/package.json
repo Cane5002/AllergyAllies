@@ -21,7 +21,7 @@
     "nodemon": "^3.0.1",
     "pdfkit-table": "^0.1.99",
     "sharp": "^0.32.6",
-    "supertest": "^6.3.3"
+    "supertest": "^6.3.4"
   },
   "devDependencies": {
     "jest": "^29.7.0"
