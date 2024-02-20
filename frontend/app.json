@@ -29,6 +29,10 @@
     },
     "plugins": [
       "expo-build-properties"
-    ]
+    ],
+    "database": {
+      "IP": "http://localhost",
+      "Port": "5000"
+    }
   }
 }

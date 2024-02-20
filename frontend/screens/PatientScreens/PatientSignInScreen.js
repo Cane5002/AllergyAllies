@@ -20,7 +20,7 @@ export default function PatientSignInScreen({navigation}) {
          
          // this needs to have your ip address for android (probably iOS too). 
          // get ip quickly from "Metro waiting on exp://<ip>:port"
-         const response = await axios.post('http://10.136.103.100:5000/auth/', authData);
+         const response = await axios.post(`${process.env.APP_MANIFEST.database.IP}:${process.env.APP_MANIFEST.database.Port}/auth/`, authData);
          console.log(response);
          // response successful
          if (response.status === 200) {
