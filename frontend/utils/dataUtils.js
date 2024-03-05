@@ -42,17 +42,18 @@ const downloadRefill = (data, callback) => {
         else expirationData = '\"' + expirationData + '\"';
 
         //Vial info
-        let vialInfo = '\"';
+        let vialInfo = "";
         row.vialInfo.forEach((d) => {
             vialInfo += d.bottleName + ': ' + d.info + '\n';
         })
-        vialInfo += '\"';
+        if (vialInfo == "") vialInfo += 'N/A';
+        else vialInfo = '\"' + vialInfo + '\"';
 
         exportable.push({
-            Name: row.patientName,
-            DOB: row.DOB,
-            Email: row.email,
-            Phone: row.phone,
+            Name: (row.patientName)? row.patientName : "N/A",
+            DOB: (row.DOB)? row.DOB : "N/A",
+            Email: (row.email)? row.email : "N/A",
+            Phone: (row.phone)? row.phone : "N/A",
             Refills: refillData,
             Expirations: expirationData,
             Vials: vialInfo
