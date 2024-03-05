@@ -1,3 +1,67 @@
+
+const refillHeaders = [ {
+    name: 'Name',
+    alias: 'Name'
+}, {
+    name: 'DOB',
+    alias: 'DOB'
+}, {
+    name: 'Email',
+    alias: 'Email'
+}, {
+    name: 'Phone',
+    alias: 'Phone'
+}, {
+    name: 'Refills',
+    alias: 'Refills'
+}, {
+    name: 'Expirations',
+    alias: 'Expirations'
+}, {
+    name: 'Vials',
+    alias: 'Vials'
+}];
+
+const downloadRefill = (data, callback) => {
+    let exportable = [];
+    data.forEach((row) => {
+        //Refill Data
+        let refillData = "";
+        row.refillData.forEach((d) => {
+            refillData += d.bottleName + '\n';
+        })
+        if (refillData == "") refillData = 'N/A';
+        else refillData = '\"' + refillData + '\"';
+
+        //Expiration Data
+        let expirationData = "";
+        row.expirationData.forEach((d) => {
+            ret += d.bottleName + ': ' + d.expirationData + '\n';
+        })
+        if (expirationData == "") expirationData += 'N/A';
+        else expirationData = '\"' + expirationData + '\"';
+
+        //Vial info
+        let vialInfo = '\"';
+        row.vialInfo.forEach((d) => {
+            vialInfo += d.bottleName + ': ' + d.info + '\n';
+        })
+        vialInfo += '\"';
+
+        exportable.push({
+            Name: row.patientName,
+            DOB: row.DOB,
+            Email: row.email,
+            Phone: row.phone,
+            Refills: refillData,
+            Expirations: expirationData,
+            Vials: vialInfo
+        });
+    })
+
+    callback(refillHeaders, exportable);
+}
+
 const refillReportToCsv = (data) => {
     console.log("REFILL REPORT");
     console.log(data);
@@ -42,7 +106,7 @@ const refillReportToCsv = (data) => {
 const reportToCsv = (report) => {
     let csv = '';
     // Title
-    csv += report.type + ',' + report.dateGenerated + '\n';
+    csv += report.type + ' Report,' + report.dateGenerated + '\n';
     // data
     switch(report.type) {
         case 'Attrition':
@@ -65,4 +129,4 @@ const reportToCsv = (report) => {
     return csv;
 }
 
-export { reportToCsv };
+export { reportToCsv, downloadRefill };
