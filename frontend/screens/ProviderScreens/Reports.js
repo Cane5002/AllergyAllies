@@ -6,6 +6,7 @@ import User from '../../User';
 import AuthContext from '../../AuthContext';
 import ProviderMenu from './ProviderMenu';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import id from 'date-fns/locale/id';
 
 export default function Reports({ navigation }) {
   const userInfo = User();
@@ -49,6 +50,21 @@ export default function Reports({ navigation }) {
       console.error('Error storing reports:', error);
     }
   };
+
+  const downloadReport = (report) => {
+    if (!report) return;
+    console.log("Initiating download");
+    console.log(report);
+    var str = JSON.stringify(report);
+    var bytes = new TextEncoder().encode(str);
+    var data = new Blob([bytes], {type: "application/json;charset=utf-8"});
+    console.log(data);
+    var jsonURL = window.URL.createObjectURL(data);
+    var tempLink = document.createElement('a');
+    tempLink.href = jsonURL;
+    tempLink.setAttribute('download', 'report.json');
+    tempLink.click();
+  }
 
   useEffect(() => {
     const fetchData = async () => {
@@ -197,9 +213,14 @@ export default function Reports({ navigation }) {
             <DataTable.Row key={index} style={index % 2 === 0 ? styles.tableRow2 : styles.tableRow1}>
               <DataTable.Cell>
                 {report.data ? (
-                  <TouchableOpacity onPress={() => openModal(report)}>
-                    <Text style={{ color: '#1059d5', textDecorationLine: 'underline' }}>View</Text>
-                  </TouchableOpacity>
+                  <View style={{ flex: 1, flexDirection: 'row', flexWrap: 'wrap' }}>
+                    <TouchableOpacity onPress={() => openModal(report)}>
+                      <Text style={{ color: '#1059d5', textDecorationLine: 'underline', marginRight: 10 }}>View</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => downloadReport(report)}>
+                      <Text style={{ color: '#1059d5', textDecorationLine: 'underline' }}>Download</Text>
+                    </TouchableOpacity>
+                  </View>
                 ) : (
                   <Text>No patients at risk of attrition.</Text>
                 )}
@@ -230,9 +251,14 @@ export default function Reports({ navigation }) {
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text>{selectedReport && selectedReport.data ? JSON.stringify(selectedReport.data, null, 2) : ''}</Text>
-            <TouchableOpacity onPress={closeModal}>
-              <Text style={{ color: 'blue', marginTop: 10 }}>Close</Text>
-            </TouchableOpacity>
+            <View style={{ flex: 1, flexDirection: 'row', flexWrap: 'wrap', marginTop: 10 }}>
+              <TouchableOpacity onPress={closeModal}>
+                <Text style={{ color: 'blue', marginRight: 10 }}>Close</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => downloadReport(selectedReport)}>
+                <Text style={{ color: 'blue'}}>Download</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </Modal>
