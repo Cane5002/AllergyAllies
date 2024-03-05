@@ -276,7 +276,10 @@ exports.generateRefillsReport = async (req, res) => {
             if (patientCurrentBottleNumber === 'M') {
                 patientCurrentBottleNumber = matchingBottle.maintenanceNumber;
             }
-            vialInfo.push(`${b.nameOfBottle} ${patientCurrentBottleNumber}/${matchingBottle.maintenanceNumber}`);
+            vialInfo.push({
+                bottleName: b.nameOfBottle,
+                info: `${patientCurrentBottleNumber}/${matchingBottle.maintenanceNumber}`
+            });
         }
 
         patientRefillsData.push({

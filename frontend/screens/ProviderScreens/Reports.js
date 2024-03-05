@@ -7,6 +7,7 @@ import AuthContext from '../../AuthContext';
 import ProviderMenu from './ProviderMenu';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import id from 'date-fns/locale/id';
+import { reportToCsv } from '../../utils/dataUtils'
 
 export default function Reports({ navigation }) {
   const userInfo = User();
@@ -51,19 +52,19 @@ export default function Reports({ navigation }) {
     }
   };
 
-  const downloadReport = (report) => {
+  const downloadCsv = (report) => {
     if (!report) return;
     console.log("Initiating download");
     console.log(report);
-    var str = JSON.stringify(report);
-    var bytes = new TextEncoder().encode(str);
-    var data = new Blob([bytes], {type: "application/json;charset=utf-8"});
-    console.log(data);
-    var jsonURL = window.URL.createObjectURL(data);
-    var tempLink = document.createElement('a');
-    tempLink.href = jsonURL;
-    tempLink.setAttribute('download', 'report.json');
-    tempLink.click();
+    var csvData = reportToCsv(report);
+    var blob = new Blob([csvData], {type: "text/csv"});
+    console.log(blob);
+    var url = window.URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.setAttribute('download', 'report.csv');
+    document.body.appendChild(a);
+    a.click();
   }
 
   useEffect(() => {
@@ -217,8 +218,11 @@ export default function Reports({ navigation }) {
                     <TouchableOpacity onPress={() => openModal(report)}>
                       <Text style={{ color: '#1059d5', textDecorationLine: 'underline', marginRight: 10 }}>View</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => downloadReport(report)}>
-                      <Text style={{ color: '#1059d5', textDecorationLine: 'underline' }}>Download</Text>
+                    <TouchableOpacity onPress={() => downloadCsv(report)}>
+                      <Text style={{ color: '#1059d5', textDecorationLine: 'underline', marginRight: 5 }}>CSV</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => downloadCsv(report)}>
+                      <Text style={{ color: '#1059d5', textDecorationLine: 'underline' }}>PDF</Text>
                     </TouchableOpacity>
                   </View>
                 ) : (
@@ -255,9 +259,15 @@ export default function Reports({ navigation }) {
               <TouchableOpacity onPress={closeModal}>
                 <Text style={{ color: 'blue', marginRight: 10 }}>Close</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => downloadReport(selectedReport)}>
-                <Text style={{ color: 'blue'}}>Download</Text>
+              <Text>Download ( </Text>
+              <TouchableOpacity onPress={() => downloadCsv(selectedReport)}>
+                <Text style={{ color: 'blue'}}>CSV</Text>
               </TouchableOpacity>
+              <Text> | </Text>
+              <TouchableOpacity onPress={() => downloadCsv(selectedReport)}>
+                <Text style={{ color: 'blue'}}>PDF</Text>
+              </TouchableOpacity>
+              <Text> )</Text>
             </View>
           </View>
         </View>
