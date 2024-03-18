@@ -28,12 +28,26 @@ export default function ProviderSignUpScreen() {
         return;
       }
       */
-      // Check password complexity
-      if (password.length < 12 || !/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/\d/.test(password) || !/[^A-Za-z0-9]/.test(password)) {
-        setDisplay('Password must be at least 12 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.');
+      
+      if (NPI.length != 10) {
+        setDisplay('NPI number must contain 10 digits');
         success = false;
         return;
       }
+      // Check password complexity
+      if (
+        password.length < 12 ||
+        !/[A-Z]/.test(password) || // At least one uppercase letter
+        !/[a-z]/.test(password) || // At least one lowercase letter
+        !/\d/.test(password) || // At least one digit
+        !/[^A-Za-z0-9]/.test(password) || // At least one special character
+        /['";\-\/()<>%&]/.test(password) // Check for common characters used in injection attacks
+      ) {
+        setDisplay('Password must be at least 12 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character (NOT \'\";\-\/()<>%&)');
+        success = false;
+        return;
+      }
+
       if (password == confirmPass) {
         try {
           const data = {
