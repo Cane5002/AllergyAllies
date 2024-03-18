@@ -15,8 +15,8 @@ export default function ProviderSignUpScreen() {
   const [practiceCode, setPracticeCode] = useState('');
 
   const handleSignUp = async () => {
-    setDisplay('')
-    if (firstName && lastName && email && password && confirmPass && NPI && practiceCode) { 
+
+      if (firstName && lastName && email && password && confirmPass && NPI && practiceCode) { 
       const practice = await axios.get(`http://localhost:5000/api/practiceByCode/${practiceCode}`);
 
       const practiceID = practice.data._id;
@@ -44,7 +44,7 @@ export default function ProviderSignUpScreen() {
             NPI,
             practiceID
           }
-
+          /*
           // Used to check if provider has a valid NPI, WIP
           //const NPIreigstryURI = `https://npiregistry.cms.hhs.gov/api/?number=${NPI}&pretty=&version=2.1`
           const NPIreigstryURI = `https://clinicaltables.nlm.nih.gov/api/npi_org/v3/search?terms=${NPI}`
@@ -55,7 +55,7 @@ export default function ProviderSignUpScreen() {
 
           if (emailNPIExists.status === 200) {
             const response = await axios.post('http://localhost:5000/api/addProvider', data);
-            /*
+            
             if (NPIexists.data[0] == 1) {
               const response = await axios.post('http://localhost:5000/api/addProvider', data);
             }
@@ -63,7 +63,7 @@ export default function ProviderSignUpScreen() {
               setDisplay('Invalid NPI')
               success = false;
             }
-            */
+            
           }
           else if (emailNPIExists.status === 201) {
             setDisplay('This email is already associated with an account!');
@@ -73,10 +73,14 @@ export default function ProviderSignUpScreen() {
             setDisplay('This NPI cannot be used.');
             success = false;
           }
-
+          */
+          const response = await axios.post('http://localhost:5000/api/addProvider', data);
+          console.log(response);
         }
         catch (error) {
           success = false;
+          //troubleshooting signup!
+          setDisplay('Error');
           console.log(error, " Error");
         }
       }
