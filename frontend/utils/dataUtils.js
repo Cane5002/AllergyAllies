@@ -1,15 +1,15 @@
 
 const refillHeaders = [ {
-    name: 'Name',
+    name: 'patientName',
     alias: 'Name'
 }, {
     name: 'DOB',
     alias: 'DOB'
 }, {
-    name: 'Email',
+    name: 'email',
     alias: 'Email'
 }, {
-    name: 'Phone',
+    name: 'phoneNumber',
     alias: 'Phone'
 }, {
     name: 'Refills',
@@ -18,10 +18,90 @@ const refillHeaders = [ {
     name: 'Expirations',
     alias: 'Expirations'
 }, {
-    name: 'Vials',
-    alias: 'Vials'
+    name: 'VialInfo',
+    alias: 'Next Bottle'
 }];
 
+const retestHeaders = [ {
+    name: 'patientName',
+    alias: 'Name'
+}, {
+    name: 'DOB',
+    alias: 'DOB'
+}, {
+    name: 'email',
+    alias: 'Email'
+}, {
+    name: 'phoneNumber',
+    alias: 'Phone'
+}, {
+    name: 'treatmentStartDate',
+    alias: 'Treatment Start'
+}, {
+    name: 'maintenanceDate',
+    alias: 'Maintenance Date'
+}, {
+    name: 'dateLastTested',
+    alias: 'Last Tested'
+}];
+
+const maintenanceHeaders = [ {
+    name: 'patientName',
+    alias: 'Name'
+}, {
+    name: 'DOB',
+    alias: 'DOB'
+}, {
+    name: 'email',
+    alias: 'Email'
+}, {
+    name: 'phoneNumber',
+    alias: 'Phone'
+}, {
+    name: 'startDate',
+    alias: 'Start Date'
+}, {
+    name: 'MaintenanceBottles',
+    alias: 'Maintence Bottles'
+}];
+
+const attritionHeaders = [ {
+    name: 'patientName',
+    alias: 'Name'
+}, {
+    name: 'DOB',
+    alias: 'DOB'
+}, {
+    name: 'email',
+    alias: 'Email'
+}, {
+    name: 'phoneNumber',
+    alias: 'Phone'
+}, {
+    name: 'statusDate',
+    alias: 'Status Date'
+}, {
+    name: 'daysSinceLastInjection',
+    alias: 'Days Since Last Injection'
+}, {
+    name: 'bottlesInfo',
+    alias: 'Bottle Info'
+}];
+
+const getHeaders = (type) => {
+    switch (type) {
+    case "Refills": 
+        return refillHeaders;
+    case "Needs Retest":
+        return retestHeaders;
+    case "Approaching Maintenance":
+        return maintenanceHeaders;
+    case "Attrition":
+        return attritionHeaders;
+    }
+}
+
+// DEPRECIATED
 const downloadRefill = (data, callback) => {
     let exportable = [];
     data.forEach((row) => {
@@ -56,13 +136,14 @@ const downloadRefill = (data, callback) => {
             Phone: (row.phone)? row.phone : "N/A",
             Refills: refillData,
             Expirations: expirationData,
-            Vials: vialInfo
+            VialInfo: vialInfo
         });
     })
 
     callback(refillHeaders, exportable);
 }
 
+//DEPRECIATED
 const refillReportToCsv = (data) => {
     console.log("REFILL REPORT");
     console.log(data);
@@ -103,6 +184,7 @@ const refillReportToCsv = (data) => {
     return ret;
 }
 
+// DEPRECIATED
 //json formatted report to csv
 const reportToCsv = (report) => {
     let csv = '';
@@ -130,4 +212,4 @@ const reportToCsv = (report) => {
     return csv;
 }
 
-export { reportToCsv, downloadRefill };
+export { getHeaders };

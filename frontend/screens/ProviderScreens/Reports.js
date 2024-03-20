@@ -7,7 +7,7 @@ import AuthContext from '../../AuthContext';
 import ProviderMenu from './ProviderMenu';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import id from 'date-fns/locale/id';
-import { reportToCsv, downloadRefill } from '../../utils/dataUtils'
+import { getHeaders } from '../../utils/dataUtils';
 import jsObjExporter from '../../utils/jsObjExporter/index.js';
 
 export default function Reports({ navigation }) {
@@ -73,17 +73,15 @@ export default function Reports({ navigation }) {
     console.log("Initiating " + format + " download");
     console.log(report);
 
-    downloadRefill (report.data.data, (headers, exportable) => {
-      objectExporter({
-        exportable: exportable,
-        type: format,
-        headers: headers,
-        fileName: report.type+"Report"+report.dateGenerated, 
-        headerStyle: 'font-weight: bold; padding: 5px; border: 1px solid #dddddd;',
-        cellStyle: 'padding: 5px; border: 1px solid #dddddd;',
-        documentTitle: report.type+" Report "+report.dateGenerated,
-        documentTitleStyle: 'font-weight: bold; padding: 10px; font-size: 30px'
-      })
+    objectExporter({
+      exportable: report.data.data,
+      type: format,
+      headers: getHeaders(report.type),
+      fileName: report.type.replace(/\s/g, '')+"Report"+report.dateGenerated, 
+      headerStyle: 'font-weight: bold; padding: 5px; border: 1px solid #dddddd;',
+      cellStyle: 'padding: 5px; border: 1px solid #dddddd;',
+      documentTitle: report.type+" Report "+report.dateGenerated,
+      documentTitleStyle: 'font-weight: bold; padding: 10px; font-size: 30px'
     })
   }
 
@@ -238,7 +236,7 @@ export default function Reports({ navigation }) {
                     <TouchableOpacity onPress={() => openModal(report)}>
                       <Text style={{ color: '#1059d5', textDecorationLine: 'underline', marginRight: 10 }}>View</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => downloadCsv(report)}>
+                    <TouchableOpacity onPress={() => downloadReport(report, 'csv')}>
                       <Text style={{ color: '#1059d5', textDecorationLine: 'underline', marginRight: 5 }}>CSV</Text>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => downloadReport(report, 'pdf')}>
@@ -274,7 +272,7 @@ export default function Reports({ navigation }) {
       <Modal visible={modalVisible} transparent={true} animationType="slide" onRequestClose={closeModal}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <Text>{selectedReport && selectedReport.data ? JSON.stringify(selectedReport.data, null, 2) : ''}</Text>
+            {/* <Text>{selectedReport && selectedReport.data ? JSON.stringify(selectedReport.data, null, 2) : ''}</Text> */}
             <View style={{ flex: 1, flexDirection: 'row', flexWrap: 'wrap', marginTop: 10 }}>
               <TouchableOpacity onPress={closeModal}>
                 <Text style={{ color: 'blue', marginRight: 10 }}>Close</Text>
