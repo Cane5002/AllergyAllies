@@ -31,7 +31,7 @@ export default function PatientSignUpScreen() {
     setDisplay('')
     if (firstName && lastName && email && password && confirmPass) {
 
-      const practice = await axios.get(`http://localhost:5000/api/practiceByCode/${practiceCode}`);
+      const practice = await axios.get(`http://192.168.86.25:5000/api/practiceByCode/${practiceCode}`);
 
       const practiceID = practice.data._id;
       pracID = practiceID;
@@ -72,10 +72,10 @@ export default function PatientSignUpScreen() {
             return;
           }
 
-          const emailExists = await axios.post('http://localhost:5000/api/checkEmail', { email });
+          const emailExists = await axios.post('http://192.168.86.25:5000/api/checkEmail', { email });
 
           if (emailExists.status === 200) {
-            const response = await axios.post('http://localhost:5000/api/addPatient', data);
+            const response = await axios.post('http://192.168.86.25:5000/api/addPatient', data);
             console.log(response);
           }
           else if (emailExists.status === 201) {
@@ -100,7 +100,7 @@ export default function PatientSignUpScreen() {
     }
     if (success) {
       // Add initial blank treatment to account to be used in calculations
-      const patient = await axios.get(`http://localhost:5000/api/findPatient/${email}`)
+      const patient = await axios.get(`http://192.168.86.25:5000/api/findPatient/${email}`)
       const pID = patient.data._id
 
       console.log(pID);
@@ -114,7 +114,7 @@ export default function PatientSignUpScreen() {
         practiceID: pracID
       }
 
-      const addingTreatment = await axios.post(`http://localhost:5000/api/addTreatment`, toAdd)
+      const addingTreatment = await axios.post(`http://192.168.86.25:5000/api/addTreatment`, toAdd)
 
 
 
@@ -237,6 +237,7 @@ const styles = StyleSheet.create({
     alignItems: height > width ? null : 'center',
   },
   title: {
+    marginBottom: 15,
     textAlign: 'center',
     fontSize: 20,
     fontWeight: 'bold',
@@ -248,7 +249,8 @@ const styles = StyleSheet.create({
     color: '#DC143C',
   },
   shortInput: {
-    margin: 15,
+    marginHorizontal: 15,
+    marginVertical: 5,
     flexGrow: 1,
     height: 40,
     width: height > width ? null : 136,
@@ -257,7 +259,8 @@ const styles = StyleSheet.create({
     padding: 10
   },
   input: {
-    margin: 15,
+    marginHorizontal: 15,
+    marginVertical: 5,
     height: 40,
     width: height > width ? null : 300,
     borderColor: '#1059d5',
