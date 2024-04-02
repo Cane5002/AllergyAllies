@@ -30,10 +30,10 @@
     "expo-secure-store": "~12.3.1",
     "expo-status-bar": "~1.6.0",
     "jwt-decode": "^3.1.2",
-    "mongodb": "^6.2.0",
+    "mongodb": "^6.3.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "react-native": "0.72.6",
+    "react-native": "0.73.3",
     "react-native-circular-progress": "^1.3.9",
     "react-native-dropdown-picker": "^5.4.6",
     "react-native-dropdown-select-list": "^2.0.5",
@@ -47,8 +47,8 @@
     "react-native-screens": "~3.22.0",
     "react-native-svg": "13.9.0",
     "react-native-web": "~0.19.6",
-    "survey-core": "^1.9.112",
-    "survey-react-ui": "^1.9.112"
+    "survey-core": "^1.9.127",
+    "survey-react-ui": "^1.9.127"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"
