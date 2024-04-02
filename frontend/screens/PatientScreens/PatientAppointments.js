@@ -47,7 +47,7 @@ export default function PatientAppointments({navigation}){
     const findPatient = async () => {
       if (email){
         //replace with your IP address, find quickly from "Metro waiting on exp://<ip>:port" under QR code
-        const patientObj = await axios.get(`http://172.20.10.3:5000/api/findPatient/${email}`)
+        const patientObj = await axios.get(process.env.APP_MANIFEST.databaseIP + `api/findPatient/${email}`)
         setPatient(patientObj.data)
       }
     }
@@ -56,7 +56,7 @@ export default function PatientAppointments({navigation}){
     //get the list of treatments associated with patient
     const findTreatments = async () => {
         //replace with your IP address, find quickly from "Metro waiting on exp://<ip>:port" under QR code
-        const treatmentsObj = await axios.get(`http://172.20.10.3:5000/api/getAllTreatmentsByID/${patient._id}`)
+        const treatmentsObj = await axios.get(`${process.env.APP_MANIFEST.database.IP}:${process.env.APP_MANIFEST.database.Port}/api/getAllTreatmentsByID/${patient._id}`)
         
 
         //sort treatments by date
