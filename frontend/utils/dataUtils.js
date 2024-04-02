@@ -12,14 +12,17 @@ const refillHeaders = [ {
     name: 'phoneNumber',
     alias: 'Phone'
 }, {
-    name: 'Refills',
-    alias: 'Refills'
+    name: 'Escalations',
+    alias: 'Escalations'
 }, {
     name: 'Expirations',
     alias: 'Expirations'
 }, {
-    name: 'VialInfo',
-    alias: 'Next Bottle'
+    name: 'BottleInfo',
+    alias: 'Mix Bottle #'
+}, {
+    name: 'InjectionInfo',
+    alias: 'Recent Injection Vol'
 }];
 
 const retestHeaders = [ {
@@ -61,7 +64,7 @@ const maintenanceHeaders = [ {
     name: 'startDate',
     alias: 'Start Date'
 }, {
-    name: 'MaintenanceBottles',
+    name: 'maintenanceBottles',
     alias: 'Maintence Bottles'
 }];
 

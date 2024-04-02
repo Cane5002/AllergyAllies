@@ -3,6 +3,7 @@ const router = express.Router();
 const reportController = require('../controllers/report_controller');
 //const verifyJWT = require('../middleware/verify_JWT');
 
+router.get('/getAllReports/:providerID', reportController.getAllReports);
 //router.use(verifyJWT)
 router.get('/getAllReportNames/:providerID', reportController.getAllReportNames);
 // :id -> report id
