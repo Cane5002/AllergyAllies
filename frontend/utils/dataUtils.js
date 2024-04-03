@@ -12,17 +12,17 @@ const refillHeaders = [ {
     name: 'phoneNumber',
     alias: 'Phone'
 }, {
-    name: 'Escalations',
-    alias: 'Escalations'
+    name: 'expiration',
+    alias: 'Expires'
 }, {
-    name: 'Expirations',
-    alias: 'Expirations'
+    name: 'vialName',
+    alias: 'Vial'
 }, {
-    name: 'BottleInfo',
-    alias: 'Mix Bottle #'
+    name: 'vialStatus',
+    alias: 'Bottle/Dil (Maint)'
 }, {
-    name: 'InjectionInfo',
-    alias: 'Recent Injection Vol'
+    name: 'lastInjection',
+    alias: 'Last Injection Vol'
 }];
 
 const retestHeaders = [ {
@@ -64,8 +64,14 @@ const maintenanceHeaders = [ {
     name: 'startDate',
     alias: 'Start Date'
 }, {
-    name: 'maintenanceBottles',
-    alias: 'Maintence Bottles'
+    name: 'vialName',
+    alias: 'Vial'
+}, {
+    name: 'vialStatus',
+    alias: 'Bottle/Dil (Maint)'
+},  {
+    name: 'lastInjection',
+    alias: 'Last Injection Vol'
 }];
 
 const attritionHeaders = [ {
@@ -87,17 +93,23 @@ const attritionHeaders = [ {
     name: 'daysSinceLastInjection',
     alias: 'Days Since Last Injection'
 }, {
-    name: 'bottlesInfo',
-    alias: 'Bottle Info'
+    name: 'vialName',
+    alias: 'Vial'
+}, {
+    name: 'vialStatus',
+    alias: 'Bottle/Dil (Maint)'
+},  {
+    name: 'lastInjection',
+    alias: 'Last Injection Vol'
 }];
 
 const getHeaders = (type) => {
     switch (type) {
     case "Refills": 
         return refillHeaders;
-    case "Needs Retest":
+    case "NeedsRetest":
         return retestHeaders;
-    case "Approaching Maintenance":
+    case "ApproachingMaintenance":
         return maintenanceHeaders;
     case "Attrition":
         return attritionHeaders;

@@ -24,6 +24,9 @@ export function htmlTblCreater (type, headers, exportable, headerStyle, cellStyl
 
     // Construct the body elements
     for (let j = 0; j < exportable.length; j++) {
+      if (exportable[j].cellStyle) {
+        cellStyle = exportable[j].cellStyle;
+      }
       dataset += '<tr style="' + cellStyle + '">'
       for (let k = 0; k < Object.keys(exportable[j]).length - 1; k++) {
         // Check if the input string is HTML, if so, do not add the cell tags
@@ -61,7 +64,11 @@ export function htmlTblCreater (type, headers, exportable, headerStyle, cellStyl
 
     // Construct the body elements
     for (let j = 0; j < exportable.length; j++) {
-      dataset += '<tr style="' + cellStyle + '">'
+      // If exportable has a cellstyle, use individual cellstyle instead
+      if (exportable[j].cellStyle) {
+        cellStyle = exportable[j].cellStyle;
+      }
+      dataset += `<tr style="${cellStyle}">`
       // Loop through the header items to show only the items associated with a header
       for (let k = 0; k < headers.length; k++) {
         // Check if the input string is HTML, if so, do not add the cell tags

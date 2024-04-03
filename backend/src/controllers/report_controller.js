@@ -58,7 +58,7 @@ exports.getAllReports = async (req, res) => {
         if (!provider) {
             return res.status(401).json({message: "Provider not found"});
         }
-        const reports = await Report.find({ practiceID: provider.practiceID}).select({reportName: 1, reportType: 1, data: 1});
+        const reports = await Report.find({ practiceID: provider.practiceID}).sort({_id: -1}).select({reportName: 1, reportType: 1, data: 1});
         return res.status(200).json({ reports });
     } catch (error) {
         res.status(404).json({ message: error.message });
@@ -96,6 +96,8 @@ exports.getReportData = async (req, res) => {
 }
 
 /*============== Generate Report Functions ====================*/
+const cellStyleMain = "padding: 5px; border: 1px solid #dddddd; font-weight: bold; color: #08088f; background-color: #FF0000"
+const cellStyleSub = "padding: 5px; border: 1px solid #dddddd;"
 
 exports.generateApproachingMaintenanceReport = async (req, res) => {
     const providerID = req.params.providerID;
@@ -150,7 +152,11 @@ exports.generateApproachingMaintenanceReport = async (req, res) => {
             } 
 
             // eg: Pollen 3/7, Mold 7/7 (M)
-            vialInfo.push(`${bottle.nameOfBottle}: ${patientCurrentBottleNumber}/${bottle.injDilution}(${matchingBottle.maintenanceNumber})`);
+            vialInfo.push({ 
+                name: bottle.nameOfBottle, 
+                status: `${bottle.currBottleNumber}/${bottle.injDilution} (${matchingBottle.maintenanceNumber})`, 
+                lastInjection: `${bottle.injVol}`
+            });
 
             // get earliest treatment date
             if(treatmentStartDate > bottle.date) {
@@ -161,20 +167,26 @@ exports.generateApproachingMaintenanceReport = async (req, res) => {
         if (vialInfo.length > 0 && !allBottlesAtMaintenance && atleastOneMaintenanceBottle) {
             approachingMaintenanceData.push({
                 patientName: patient.firstName + " " + patient.lastName,
-                maintenanceBottles: vialInfo[0],
                 startDate: treatmentStartDate,
                 DOB: patient.DoB ? patient.DoB : 'N/A',
                 phoneNumber: patient.phone ? patient.phone : 'N/A',
                 email: patient.email ? patient.email : 'N/A',
+                vialName: vialInfo[0].name,
+                vialStatus: vialInfo[0].status,
+                lastInjection: vialInfo[0].lastInjection,
+                cellStyle: cellStyleMain
             });
             for (let i = 1; i < vialInfo.length; i++) {
                 approachingMaintenanceData.push({
                     patientName: "",
-                    maintenanceBottles: vialInfo[0],
                     startDate: "",
                     DOB: "",
                     phoneNumber: "",
                     email: "",
+                    vialName: vialInfo[i].name,
+                    vialStatus: vialInfo[i].status,
+                    lastInjection: vialInfo[i].lastInjection,
+                    cellStyle: cellStyleSub
                 });
             }
         }
@@ -211,7 +223,7 @@ exports.generateAttritionReport = async (req, res) => {
                 continue;
             }
 
-            const patientBottles = [];
+            const vialInfo = [];
 
             // get last not attended treatment
             const foundTreatment = await getLatestTreatment({
@@ -236,30 +248,40 @@ exports.generateAttritionReport = async (req, res) => {
                 } 
                 
                 // eg: Pollen 3/7, Mold 7/7 (M)
-                patientBottles.push(`${bottle.nameOfBottle}: ${bottle.currBottleNumber}/${bottle.injDilution}(${matchingBottle.maintenanceNumber})`);
+                vialInfo.push({ 
+                    name: bottle.nameOfBottle, 
+                    status: `${bottle.currBottleNumber}/${bottle.injDilution} (${matchingBottle.maintenanceNumber})`, 
+                    lastInjection: `${bottle.injVol}`
+                });
             }
 
-            if (patientBottles.length > 0) {
+            if (vialInfo.length > 0) {
                 const timeDiff= today - patient.statusDate;
                 const daysSinceLastInjection = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
                 patientAttrition.push({
                     patientName: patient.firstName + " " + patient.lastName,
-                    bottlesInfo: patientBottles[0],
                     daysSinceLastInjection: daysSinceLastInjection,
                     statusDate: patient.statusDate ? patient.statusDate : 'N/A',
                     DOB: patient.DoB ? patient.DoB : 'N/A',
                     phoneNumber: patient.phone ? patient.phone : 'N/A',
                     email: patient.email ? patient.email : 'N/A',
+                    vialName: vialInfo[0].name,
+                    vialStatus: vialInfo[0].status,
+                    lastInjection: vialInfo[0].lastInjection,
+                    cellStyle: cellStyleMain
                 });
-                for (let i = 1; i < patientBottles.length; i++) {
+                for (let i = 1; i < vialInfo.length; i++) {
                     patientAttrition.push({
                         patientName: "",
-                        bottlesInfo: patientBottles[i],
                         daysSinceLastInjection: "",
                         statusDate: "",
                         DOB: "",
                         phoneNumber: "",
                         email: "",
+                        vialName: vialInfo[i].name,
+                        vialStatus: vialInfo[i].status,
+                        lastInjection: vialInfo[i].lastInjection,
+                        cellStyle: cellStyleSub
                     });
                 }
             }
@@ -303,26 +325,23 @@ exports.generateRefillsReport = async (req, res) => {
             continue;
         }
 
-        let bottleEscalationData = "";
-        let bottleExpirationData = "";
         const vialInfo = [];
-        for (const b of patientTreatment.bottles) {
-            if (!b.needsRefill) continue
-            else if (b.bottleStatus === "EXPIRING") bottleExpirationData += `${b.nameOfBottle}: ${b.expirationDate}\n`
-            else if (b.bottleStatus === "NEEDS_MIX") bottleEscalationData += b.nameOfBottle + '\n';
+        for (const bottle of patientTreatment.bottles) {
+            if (!bottle.needsRefill) continue
 
-            const matchingBottle = await findMatchingBottle(p, b);
+            const matchingBottle = await findMatchingBottle(p, bottle);
             if (!matchingBottle) {
-                console.log("Couldnt find matching bottle for " + b.nameOfBottle);
+                console.log("Couldnt find matching bottle for " + bottle.nameOfBottle);
                 continue;
             }
-            if (b.currBottleNumber === 'M') b.currBottleNumber = matchingBottle.maintenanceNumber;
-            vialInfo.push({ bottle: `${b.nameOfBottle}: ${b.currBottleNumber}/${b.injDilution}(${matchingBottle.maintenanceNumber})`, injection: `${b.injVol}`})
+            if (bottle.currBottleNumber === 'M') bottle.currBottleNumber = matchingBottle.maintenanceNumber;
+            vialInfo.push({ 
+                name: bottle.nameOfBottle, 
+                status: `${bottle.currBottleNumber}/${bottle.injDilution} (${matchingBottle.maintenanceNumber})`, 
+                lastInjection: `${bottle.injVol}`,
+                expiration: bottle.expirationDate
+            });
         }
-        if (bottleEscalationData == "") bottleEscalationData = 'N/A';
-        else bottleEscalationData = '\"' + bottleEscalationData + '\"';
-        if (bottleExpirationData == "") bottleExpirationData += 'N/A';
-        else bottleExpirationData = '\"' + bottleExpirationData + '\"';
 
         if (vialInfo.length > 0) {
             patientRefillsData.push({
@@ -330,10 +349,11 @@ exports.generateRefillsReport = async (req, res) => {
                 DOB: p.DoB ? p.DoB : "N/A",
                 email: p.email ? p.email : "N/A",
                 phoneNumber: p.phone ? p.phone : "N/A",
-                Escalations: bottleEscalationData,
-                Expirations: bottleExpirationData,
-                BottleInfo: vialInfo[0].bottle,
-                InjectionInfo: vialInfo[0].injection
+                expiration: vialInfo[0].expiration,
+                vialName: vialInfo[0].name,
+                vialStatus: vialInfo[0].status,
+                lastInjection: vialInfo[0].lastInjection,
+                cellStyle: cellStyleMain
             });
             for (let i = 1; i < vialInfo.length; i++) {
                 patientRefillsData.push({
@@ -341,10 +361,11 @@ exports.generateRefillsReport = async (req, res) => {
                     DOB: "",
                     email: "",
                     phoneNumber: "",
-                    Escalations: "",
-                    Expirations: "",
-                    BottleInfo: vialInfo[i].bottle,
-                    InjectionInfo: vialInfo[i].injection
+                    expiration: vialInfo[i].expiration,
+                    vialName: vialInfo[i].name,
+                    vialStatus: vialInfo[i].status,
+                    lastInjection: vialInfo[i].lastInjection,
+                    cellStyle: cellStyleSub
                 });
             }
         }
@@ -403,6 +424,7 @@ exports.generateNeedsRetestReport = async (req, res) => {
             DOB: patient.DoB ? patient.DoB : 'N/A',
             phoneNumber: patient.phone ? patient.phone : 'N/A',
             email: patient.email ? patient.email : 'N/A',
+            cellStyle: cellStyleMain
         });
     }
 
