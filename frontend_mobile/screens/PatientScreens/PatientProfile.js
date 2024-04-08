@@ -28,7 +28,7 @@ export default function PatientProfile({navigation}) {
     const findPatient = async () => {
       if (email){
         //replace with your IP address, find quickly from "Metro waiting on exp://<ip>:port" under QR code
-        const patientObj = await axios.get(`http://192.168.86.25:5000/api/findPatient/${email}`)
+        const patientObj = await axios.get(`${process.env.EXPO_PUBLIC_BACKEND_URL}:${process.env.EXPO_PUBLIC_BACKEND_PORT}/api/findPatient/${email}`)
         setPatient(patientObj.data)
       }
     }
@@ -36,14 +36,14 @@ export default function PatientProfile({navigation}) {
 
     const findPractice = async () => {
       //replace with your IP address, find quickly from "Metro waiting on exp://<ip>:port" under QR code
-      const practiceObj = await axios.get(`http://192.168.86.25:5000/api/practice/${patient.practiceID}`)
+      const practiceObj = await axios.get(`${process.env.EXPO_PUBLIC_BACKEND_URL}:${process.env.EXPO_PUBLIC_BACKEND_PORT}/api/practice/${patient.practiceID}`)
       setPractice(practiceObj.data)
     }
     if (!practice && patient) { findPractice(); }
 
     const findProtocol = async () => {
       //replace with your IP address, find quickly from "Metro waiting on exp://<ip>:port" under QR code
-      const protocolObj = await axios.get(`http://192.168.86.25:5000/api/getProtocol/${patient.practiceID}`)
+      const protocolObj = await axios.get(`${process.env.EXPO_PUBLIC_BACKEND_URL}:${process.env.EXPO_PUBLIC_BACKEND_PORT}/api/getProtocol/${patient.practiceID}`)
       setProtocol(protocolObj.data.protocol)
     }
     if (!protocol && patient) { findProtocol(); }
