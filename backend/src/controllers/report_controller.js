@@ -7,11 +7,17 @@ const Provider = require('../Models/provider');
 const { getAllPatientsHelper } = require('../controllers/patient_controller');
 const { generateReport, findMatchingBottle } = require('../helpers/reportHelper');
 
-async function getTreatment(patientID) {
-    const patientTreatment = await treatment.findOne({
-        patientID: patientID.toString(),
-        attended: true,
-    }).sort({ date: -1});
+// async function getLatestTreatment(patientID, attended = true) {
+//     const patientTreatment = await treatment.findOne({
+//         patientID: patientID.toString(),
+//         attended: attended,
+//     }).sort({ date: -1});
+    
+//     return patientTreatment;
+// }
+
+async function getLatestTreatment(params) {
+    const patientTreatment = await treatment.findOne(params).sort({ date: -1});
     
     return patientTreatment;
 }
@@ -42,6 +48,20 @@ exports.deleteAllReports = async (req, res) => {
         }
     } catch (error) {
         return res.status(401).json(error.message);
+    }
+}
+
+exports.getAllReports = async (req, res) => {
+    const providerID = req.params.providerID;
+    try {
+        const provider = await Provider.findById(providerID);
+        if (!provider) {
+            return res.status(401).json({message: "Provider not found"});
+        }
+        const reports = await Report.find({ practiceID: provider.practiceID}).sort({_id: -1}).select({reportName: 1, reportType: 1, data: 1});
+        return res.status(200).json({ reports });
+    } catch (error) {
+        res.status(404).json({ message: error.message });
     }
 }
 
@@ -76,6 +96,8 @@ exports.getReportData = async (req, res) => {
 }
 
 /*============== Generate Report Functions ====================*/
+const cellStyleMain = "padding: 5px; border: 1px solid #dddddd; font-weight: bold; color: #000000; background-color: #FF0000" // #08088f
+const cellStyleSub = "padding: 5px; border: 1px solid #dddddd; color: #808080;"
 
 exports.generateApproachingMaintenanceReport = async (req, res) => {
     const providerID = req.params.providerID;
@@ -96,7 +118,9 @@ exports.generateApproachingMaintenanceReport = async (req, res) => {
         }
 
         // find treatment data
-        const patientTreatment = await getTreatment(patient._id)
+        const patientTreatment = await getLatestTreatment({
+            patientID: patient._id.toString()
+        });
         
         if (!patientTreatment) {
             continue;
@@ -112,7 +136,10 @@ exports.generateApproachingMaintenanceReport = async (req, res) => {
             
             // match bottle in patient model to bottle in treatment (b)
             const matchingBottle = await findMatchingBottle(patient, bottle);
-
+            if (!matchingBottle) {
+                console.log("Couldnt find matching bottle for " + bottle.nameOfBottle);
+                continue;
+            }
             let patientCurrentBottleNumber = bottle.currBottleNumber;
 
             // check if bottle meets approaching maint. def.
@@ -125,7 +152,11 @@ exports.generateApproachingMaintenanceReport = async (req, res) => {
             } 
 
             // eg: Pollen 3/7, Mold 7/7 (M)
-            vialInfo.push(`${bottle.nameOfBottle} ${patientCurrentBottleNumber}/${matchingBottle.maintenanceNumber}`);
+            vialInfo.push({ 
+                name: bottle.nameOfBottle, 
+                status: `${bottle.currBottleNumber}/${bottle.injDilution} (${matchingBottle.maintenanceNumber})`, 
+                lastInjection: `${bottle.injVol}`
+            });
 
             // get earliest treatment date
             if(treatmentStartDate > bottle.date) {
@@ -136,12 +167,28 @@ exports.generateApproachingMaintenanceReport = async (req, res) => {
         if (vialInfo.length > 0 && !allBottlesAtMaintenance && atleastOneMaintenanceBottle) {
             approachingMaintenanceData.push({
                 patientName: patient.firstName + " " + patient.lastName,
-                maintenanceBottles: vialInfo,
                 startDate: treatmentStartDate,
-                DOB: patient.DoB,
-                phoneNumber: patient.phone,
-                email: patient.email,
+                DOB: patient.DoB ? patient.DoB : 'N/A',
+                phoneNumber: patient.phone ? patient.phone : 'N/A',
+                email: patient.email ? patient.email : 'N/A',
+                vialName: vialInfo[0].name,
+                vialStatus: vialInfo[0].status,
+                lastInjection: vialInfo[0].lastInjection,
+                cellStyle: cellStyleMain
             });
+            for (let i = 1; i < vialInfo.length; i++) {
+                approachingMaintenanceData.push({
+                    patientName: "",
+                    startDate: "",
+                    DOB: "",
+                    phoneNumber: "",
+                    email: "",
+                    vialName: vialInfo[i].name,
+                    vialStatus: vialInfo[i].status,
+                    lastInjection: vialInfo[i].lastInjection,
+                    cellStyle: cellStyleSub
+                });
+            }
         }
     }
 
@@ -176,44 +223,68 @@ exports.generateAttritionReport = async (req, res) => {
                 continue;
             }
 
-            const patientBottles = [];
+            const vialInfo = [];
 
             // get last not attended treatment
-            const foundTreatment = await treatment.findOne({
-                patientID: patient._id,
+            const foundTreatment = await getLatestTreatment({
+                patientID: patient._id.toString(),
                 attended: false,
-            }).sort({ date: -1});;
+            })
 
             if (!foundTreatment) {
-                console.log("treatment not found in attrition report");
+                console.log(`treatment not found in attrition report for ${patient.firstName} ${patient.lastName}`);
                 continue;
             }
   
             for(const bottle of foundTreatment.bottles) {
                 // find protocol to find out max bottle number
                 const matchingBottle = await findMatchingBottle(patient, bottle);
-    
-                let treatmentCurrentBottleNumber = bottle.currBottleNumber;
-                
-                if(treatmentCurrentBottleNumber === 'M') {
-                    treatmentCurrentBottleNumber = matchingBottle.maintenanceNumber;
+                if (!matchingBottle) {
+                    console.log("Couldnt find matching bottle for " + bottle.nameOfBottle);
+                    continue;
+                }
+                if(bottle.currBottleNumber === 'M') {
+                    bottle.currBottleNumber = matchingBottle.maintenanceNumber;
                 } 
                 
                 // eg: Pollen 3/7, Mold 7/7 (M)
-                patientBottles.push(`${bottle.nameOfBottle} ${treatmentCurrentBottleNumber}/${matchingBottle.maintenanceNumber}`);
+                vialInfo.push({ 
+                    name: bottle.nameOfBottle, 
+                    status: `${bottle.currBottleNumber}/${bottle.injDilution} (${matchingBottle.maintenanceNumber})`, 
+                    lastInjection: `${bottle.injVol}`
+                });
             }
 
-            const timeDiff= today - patient.statusDate;
-            const daysSinceLastInjection = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
-            patientAttrition.push({
-                patientName: patient.firstName + " " + patient.lastName,
-                bottlesInfo: patientBottles,
-                daysSinceLastInjection: daysSinceLastInjection,
-                statusDate: patient.statusDate,
-                DOB: patient.DoB,
-                phone: patient.phone,
-                email: patient.email,
-            });
+            if (vialInfo.length > 0) {
+                const timeDiff= today - patient.statusDate;
+                const daysSinceLastInjection = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+                patientAttrition.push({
+                    patientName: patient.firstName + " " + patient.lastName,
+                    daysSinceLastInjection: daysSinceLastInjection,
+                    statusDate: patient.statusDate ? patient.statusDate : 'N/A',
+                    DOB: patient.DoB ? patient.DoB : 'N/A',
+                    phoneNumber: patient.phone ? patient.phone : 'N/A',
+                    email: patient.email ? patient.email : 'N/A',
+                    vialName: vialInfo[0].name,
+                    vialStatus: vialInfo[0].status,
+                    lastInjection: vialInfo[0].lastInjection,
+                    cellStyle: cellStyleMain
+                });
+                for (let i = 1; i < vialInfo.length; i++) {
+                    patientAttrition.push({
+                        patientName: "",
+                        daysSinceLastInjection: "",
+                        statusDate: "",
+                        DOB: "",
+                        phoneNumber: "",
+                        email: "",
+                        vialName: vialInfo[i].name,
+                        vialStatus: vialInfo[i].status,
+                        lastInjection: vialInfo[i].lastInjection,
+                        cellStyle: cellStyleSub
+                    });
+                }
+            }
         }
 
         if (patientAttrition.length > 0) {
@@ -244,9 +315,9 @@ exports.generateRefillsReport = async (req, res) => {
 
     for (const p of patientsList) {
         
-        const patientTreatment = await treatment.findOne({
-            patientID: p._id,
-        });
+        const patientTreatment = await getLatestTreatment({
+            patientID: p._id.toString()
+        })
 
         const foundProtocol = await protocol.findOne({ practiceID: provider.practiceID });
 
@@ -255,39 +326,49 @@ exports.generateRefillsReport = async (req, res) => {
         }
 
         const vialInfo = [];
-        const bottleRefillsData = [];
-        const bottleExpirationData = [];
-        for (const b of patientTreatment.bottles) {
-  
-            if(b.bottleStatus === "EXPIRING") {
-                bottleExpirationData.push({
-                    bottleName: b.nameOfBottle,
-                    expirationDate: b.expirationDate,
-                });
-            }
-            else if (b.bottleStatus === "NEEDS_MIX") {
-                bottleRefillsData.push({
-                    bottleName: b.nameOfBottle,
-                });
-            }
+        for (const bottle of patientTreatment.bottles) {
+            if (!bottle.needsRefill) continue
 
-            const matchingBottle = await findMatchingBottle(p, b);
-            let patientCurrentBottleNumber = b.currBottleNumber;
-            if (patientCurrentBottleNumber === 'M') {
-                patientCurrentBottleNumber = matchingBottle.maintenanceNumber;
+            const matchingBottle = await findMatchingBottle(p, bottle);
+            if (!matchingBottle) {
+                console.log("Couldnt find matching bottle for " + bottle.nameOfBottle);
+                continue;
             }
-            vialInfo.push(`${b.nameOfBottle} ${patientCurrentBottleNumber}/${matchingBottle.maintenanceNumber}`);
+            if (bottle.currBottleNumber === 'M') bottle.currBottleNumber = matchingBottle.maintenanceNumber;
+            vialInfo.push({ 
+                name: bottle.nameOfBottle, 
+                status: `${bottle.currBottleNumber}/${bottle.injDilution} (${matchingBottle.maintenanceNumber})`, 
+                lastInjection: `${bottle.injVol}`,
+                expiration: bottle.expirationDate
+            });
         }
 
-        patientRefillsData.push({
-            patientName: p.firstName + " " + p.lastName,
-            refillData: bottleRefillsData,
-            expirationData: bottleExpirationData,
-            vialInfo: vialInfo,
-            DOB: p.DoB,
-            phone: p.phone,
-            email: p.email,
-        });
+        if (vialInfo.length > 0) {
+            patientRefillsData.push({
+                patientName: p.firstName + " " + p.lastName,
+                DOB: p.DoB ? p.DoB : "N/A",
+                email: p.email ? p.email : "N/A",
+                phoneNumber: p.phone ? p.phone : "N/A",
+                expiration: vialInfo[0].expiration,
+                vialName: vialInfo[0].name,
+                vialStatus: vialInfo[0].status,
+                lastInjection: vialInfo[0].lastInjection,
+                cellStyle: cellStyleMain
+            });
+            for (let i = 1; i < vialInfo.length; i++) {
+                patientRefillsData.push({
+                    patientName: "",
+                    DOB: "",
+                    email: "",
+                    phoneNumber: "",
+                    expiration: vialInfo[i].expiration,
+                    vialName: vialInfo[i].name,
+                    vialStatus: vialInfo[i].status,
+                    lastInjection: vialInfo[i].lastInjection,
+                    cellStyle: cellStyleSub
+                });
+            }
+        }
     }
 
     try {
@@ -320,28 +401,30 @@ exports.generateNeedsRetestReport = async (req, res) => {
         }
 
         // get newest treatment data
-        const patientTreatment = await getTreatment(patient._id);
+        const patientTreatment = await getLatestTreatment({
+            patientID: patient._id.toString()
+        })
 
         if (!patientTreatment) {
             continue;
         }
 
         let dateLastTested;
-
         if (!patientTreatment.lastVialTests) {
             dateLastTested = "N/A";
         } else {
-            dateLastTested = patientTreatment.lastVialTests.date;
+            dateLastTested = "Needs Implementation"
         }
 
         needsRetestOutput.push({
             patientName: patient.firstName + " " + patient.lastName,
-            treatmentStartDate: patient.treatmentStartDate,
-            maintenanceDate: patient.statusDate,
-            dateLastTested,
-            DOB: patient.DoB,
-            phoneNumber: patient.phone,
-            email: patient.email,
+            treatmentStartDate: patient.treatmentStartDate ? patient.treatmentStartDate : 'N/A',
+            maintenanceDate: patient.statusDate ? patient.statusDate : 'N/A',
+            dateLastTested: dateLastTested,
+            DOB: patient.DoB ? patient.DoB : 'N/A',
+            phoneNumber: patient.phone ? patient.phone : 'N/A',
+            email: patient.email ? patient.email : 'N/A',
+            cellStyle: cellStyleMain
         });
     }
 
