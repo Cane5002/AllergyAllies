@@ -96,8 +96,8 @@ exports.getReportData = async (req, res) => {
 }
 
 /*============== Generate Report Functions ====================*/
-const cellStyleMain = "padding: 5px; border: 1px solid #dddddd; font-weight: bold; color: #08088f; background-color: #FF0000"
-const cellStyleSub = "padding: 5px; border: 1px solid #dddddd;"
+const cellStyleMain = "padding: 5px; border: 1px solid #dddddd; font-weight: bold; color: #000000; background-color: #FF0000" // #08088f
+const cellStyleSub = "padding: 5px; border: 1px solid #dddddd; color: #808080;"
 
 exports.generateApproachingMaintenanceReport = async (req, res) => {
     const providerID = req.params.providerID;
