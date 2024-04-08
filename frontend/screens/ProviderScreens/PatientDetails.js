@@ -13,6 +13,8 @@ export default function PatientDetails({ route, navigation }) {
   const [lastTreatment, setLastTreatment] = useState();
   const [loading, setLoading] = useState(true);
   const [maintenanceNums, setMaintenanceNums] = useState();
+  const [recentPatients, setRecentPatients] = useState([]);
+  const [deletedPatients, setDeletedPatients] = useState([]);
 
   // Get the current bottles for this patient's practice
   useEffect(() => {
@@ -200,6 +202,24 @@ export default function PatientDetails({ route, navigation }) {
 
   );
 
+  const removePatient = async (patientToDelete) => {
+    try {
+
+       setDeletedPatients((prevDeletedPatients) => [...prevDeletedPatients, patientToDelete]);
+
+       // update the local state of patients/cards
+       const updatedPatients = recentPatients.filter((patient) => patient._id !== patientToDelete._id);
+       setRecentPatients(updatedPatients);
+  
+       // mark patient for deletion in API
+       await axios.delete(`http://localhost:5000/api/deletePatient/${patientToDelete._id}`);
+
+    } catch (error) {
+       console.error('Error deleting patient in DB', error);
+       setRecentPatients(prevPatients => [...prevPatients, patientToDelete]);
+    }
+ };
+
   const PracticeSection = () => (
     <View style={styles.section}>
       {/* TITLE */}
@@ -285,6 +305,13 @@ export default function PatientDetails({ route, navigation }) {
         onPress={() =>
           navigation.navigate('Injections', { patient })}>
         <Text style={styles.buttonText}>Add an Injection</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => {
+          removePatient(patient);          
+          navigation.navigate('ViewPatients', { patient })}}>
+        <Text style={styles.buttonText}>Remove Patient from Database</Text>
       </TouchableOpacity>
     </View>
   )
