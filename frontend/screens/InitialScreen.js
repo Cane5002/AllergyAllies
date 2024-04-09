@@ -34,6 +34,12 @@ export default function InitialScreen({navigation}){
                         navigation.navigate('ProviderSignUpScreen') }>
                         <Text style = {styles.createAccountText}>Provider Signup</Text>
                     </TouchableOpacity>
+                    <TouchableOpacity
+                        style = {styles.createPracticeButton}
+                        onPress={() =>
+                        navigation.navigate('practiceEnrollment') }>
+                        <Text style = {styles.createAccountText}>Enroll Practice</Text>
+                    </TouchableOpacity>
 
                     </View>
                     
@@ -116,6 +122,17 @@ const styles = StyleSheet.create({
        shadowOpacity: .3,
        shadowRadius: 3,
   },
+  createPracticeButton: {
+     backgroundColor: '#050505',
+     width: 150,
+     margin: 10,
+     padding: 15,
+     borderRadius: 8,
+     shadowColor: '#041f4f',
+     shadowOffset: { width: 0, height: 2 },
+     shadowOpacity: .3,
+     shadowRadius: 3,
+},
     createAccountText: {
         color: 'white',
         textAlign: 'center',

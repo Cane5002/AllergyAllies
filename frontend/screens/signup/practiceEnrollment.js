@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Dimensions, StyleSheet, TouchableOpacity } from 'react-native';
 import axios from 'axios';
 
-export default function PatientSignUpScreen() {
+export default function practiceEnrollment() {
   var success = true;
   const [display, setDisplay] = useState('');
   const [practiceName, setName] = useState('');
