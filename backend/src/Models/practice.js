@@ -6,7 +6,7 @@ const dataSchema = new mongoose.Schema({
         type: String
     },
     providerNames: {
-        required: true,
+        required: false,
         type: String
     },
     address: {

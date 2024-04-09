@@ -37,7 +37,7 @@ export default function InitialScreen({navigation}){
                     <TouchableOpacity
                         style = {styles.createPracticeButton}
                         onPress={() =>
-                        navigation.navigate('practiceEnrollment') }>
+                        navigation.navigate('PracticeEnrollment') }>
                         <Text style = {styles.createAccountText}>Enroll Practice</Text>
                     </TouchableOpacity>
 
