@@ -5,9 +5,9 @@ const dataSchema = new mongoose.Schema({
         required: true,
         type: String
     },
-    providerNames: {
+    providerNPIs: {
         required: false,
-        type: String
+        type: Array
     },
     address: {
         required: true,

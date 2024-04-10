@@ -20,6 +20,20 @@ export default function PracticeEnrollment() {
     setDisplay('')
     if (practiceName && providerNPIs && phoneNumber && address && email && officeHours && allergyShotHours && practiceCode) {
         try {
+          console.log(providerNPIs);
+          for (let npi of providerNPIs) {
+            if (isNaN(parseInt(npi))) {
+              setDisplay(`Povider NPI ${npi} must be a number`);
+              success = false;
+              return;
+            }
+            if (npi.length != 10) {
+              setDisplay(`Povider NPI ${npi} must be 10 digits`);
+              success = false;
+              return;
+            }
+          }
+
           const data = {
             practiceName,
             providerNPIs,
@@ -30,20 +44,28 @@ export default function PracticeEnrollment() {
             allergyShotHours,
             practiceCode
           }
+          
 
           const practiceExists = await axios.get(`http://localhost:5000/api/practiceByName/${practiceName}`);
           console.log(practiceExists.status);
 
-          if (practiceExists.status === 201) {
-            const response = await axios.post('http://localhost:5000/api/addPractice', data);
-            console.log(response);
-          }
-          else if (practiceExists.status === 200) {
+          if (practiceExists.status === 200) {
             setDisplay('This practice is already enrolled!');
             success = false;
-            console.log(response);
+            return;
           }
 
+          practiceExists = await axios.get(`http://localhost:5000/api/practiceByCode/${practiceCode}`);
+          console.log(practiceExists.status);
+
+          if (practiceExists.status === 200) {
+            setDisplay('This Practice Code is already in use!');
+            success = false;
+            return;
+          }
+
+          const response = await axios.post('http://localhost:5000/api/addPractice', data);
+          console.log(response);
         }
         catch (error) {
           success = false;
