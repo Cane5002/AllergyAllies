@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   title: {
-    fontSize: 24,
+    fontSize: 42,
     fontWeight: 'bold',
     color: '#063b94',
     marginBottom: 20,
@@ -108,15 +108,15 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 5,
-    padding: 10,
-    marginTop: 10,
+    padding: 15,
+    marginTop: 20,
   },
   proceedButton: {
     backgroundColor: '#063b94',
     paddingVertical: 15,
     paddingHorizontal: 30,
     borderRadius: 8,
-    marginTop: 20,
+    marginTop: 25,
   },
   proceedButtonText: {
     color: '#fff',

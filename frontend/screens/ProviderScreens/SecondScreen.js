@@ -1,9 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
 
 const SecondScreen = ({ navigation, route }) => {
   const { answers } = route.params;
   const [additionalAnswers, setAdditionalAnswers] = useState(Array(10).fill(0));
+  const [allQuestionsAnswered, setAllQuestionsAnswered] = useState(false);
+
+  useEffect(() => {
+    const areAllQuestionsAnswered = additionalAnswers.every(answer => answer !== 0);
+    setAllQuestionsAnswered(areAllQuestionsAnswered);
+  }, [additionalAnswers]);
 
   const handleSelectOption = (index, value) => {
     setAdditionalAnswers(prevAnswers => {
@@ -54,7 +60,11 @@ const SecondScreen = ({ navigation, route }) => {
               </View>
             </View>
           ))}
-          <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+          <TouchableOpacity
+            style={[styles.submitButton, !allQuestionsAnswered && styles.disabledButton]}
+            onPress={handleSubmit}
+            disabled={!allQuestionsAnswered}
+          >
             <Text style={styles.submitButtonText}>Submit</Text>
           </TouchableOpacity>
         </View>
@@ -82,14 +92,14 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   title: {
-    fontSize: 24,
+    fontSize: 32,
     fontWeight: 'bold',
     color: '#063b94',
     marginBottom: 20,
     textAlign: 'center',
   },
   subtitle: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 10,
     color: '#063b94',
@@ -98,7 +108,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   questionText: {
-    fontSize: 14,
+    fontSize: 15,
+    fontWeight: 'bold',
     marginBottom: 10,
   },
   optionsContainer: {
@@ -121,6 +132,9 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginTop: 20,
     alignItems: 'center',
+  },
+  disabledButton: {
+    opacity: 0.5,
   },
   submitButtonText: {
     color: '#fff',
