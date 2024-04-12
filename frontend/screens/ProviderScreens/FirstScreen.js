@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   selectedOption: {
-    backgroundColor: '#063b94',
+    backgroundColor: '#0b92d6',
   },
   submitButton: {
     backgroundColor: '#063b94',
