@@ -14,20 +14,19 @@ const SecondScreen = ({ navigation, route }) => {
   };
 
   const additionalQuestions = [
-    "Difficulty falling asleep",
-    "Waking up at night",
-    "Lack of a good night's sleep",
-    "Waking up tired",
-    "Fatigue",
-    "Reduced productivity",
-    "Reduced concentration",
-    "Frustrated/restless/irritable",
-    "Sad",
-    "Embarrassed",
+    "11. Difficulty falling asleep",
+    "12. Waking up at night",
+    "13. Lack of a good night's sleep",
+    "14. Waking up tired",
+    "15. Fatigue",
+    "16. Reduced productivity",
+    "17. Reduced concentration",
+    "18. Frustrated/restless/irritable",
+    "19. Sad",
+    "20. Embarrassed",
   ];
 
   const handleSubmit = () => {
-    // Combine the answers from both screens before navigating
     const combinedAnswers = [...answers, ...additionalAnswers];
     navigation.navigate('SubmitScreen', { combinedAnswers });
   };
