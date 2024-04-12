@@ -192,9 +192,9 @@ const SignedInDesktopStack = (
       <Stack.Screen name= "ViewAllAppointments" component={ViewAllAppointments} options={{title: 'ViewAllAppointments', headerBackTitleVisible: false}} />
       <Stack.Screen name="InjectionInfo" component={InjectionInfo} options={{title: 'InjectionInfo', headerBackTitleVisible: false}} />
       <Stack.Screen name="PatientInfoScreen" component={PatientInfoScreen} options={{ title: 'Patient Information' }} />
-      <Stack.Screen name="FirstScreen" component={FirstScreen} options={{ title: 'First Screen' }} />
-      <Stack.Screen name="SecondScreen" component={SecondScreen} options={{ title: 'Second Screen' }} />
-      <Stack.Screen name="SubmitScreen" component={SubmitScreen} options={{ title: 'Submit Screen' }} />
+      <Stack.Screen name="FirstScreen" component={FirstScreen} options={{ title: 'Snot Survey' }} />
+      <Stack.Screen name="SecondScreen" component={SecondScreen} options={{ title: 'Snot Survey' }} />
+      <Stack.Screen name="SubmitScreen" component={SubmitScreen} options={{ title: 'Confirmation Screen' }} />
   </>
 );
 
