@@ -114,7 +114,6 @@ export default function ViewPatients({ navigation }) {
                         inputStyles={{ color: "#7a7a7a" }}
                         dropdownStyles={styles.dropdownSelect}
                     />
-                    {/* New Button */}
             <TouchableOpacity
                 style={styles.NewButton}
                 onPress={handleNewButtonPress}>
@@ -220,11 +219,11 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontSize: 15,
     },
-    // New Button Styles
+    
     NewButton: {
-        backgroundColor: 'green', // Example background color
+        backgroundColor: 'green', 
         padding: 10,
-        marginLeft: 20, // Adjust as needed
+        marginLeft: 20,
         height: 30,
         justifyContent: 'center',
         borderRadius: 8,

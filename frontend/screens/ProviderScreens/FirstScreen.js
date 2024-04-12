@@ -1,30 +1,28 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
 
 const FirstScreen = ({ navigation }) => {
-  const [answers, setAnswers] = useState(Array(10).fill(''));
+  const [answers, setAnswers] = useState(Array(10).fill(0));
 
-  const handleInputChange = (index, value) => {
-    if (!isNaN(value) && value >= 1 && value <= 5) {
-      setAnswers(prevAnswers => {
-        const newAnswers = [...prevAnswers];
-        newAnswers[index] = value;
-        return newAnswers;
-      });
-    }
+  const handleSelectOption = (index, value) => {
+    setAnswers(prevAnswers => {
+      const newAnswers = [...prevAnswers];
+      newAnswers[index] = value;
+      return newAnswers;
+    });
   };
 
   const questions = [
-    "Question 1: Need to blow nose",
-    "Question 2: Sneezing",
-    "Question 3: Runny Nose",
-    "Question 4: Cough",
-    "Question 5: Postnasal discharge (Dripping at the back of your throat)",
-    "Question 6: Thick nasal discharge (snot)",
-    "Question 7: Ear fullness",
-    "Question 8: Dizziness",
-    "Question 9: Ear pain",
-    "Question 10: Facial Pain",
+    "Need to blow nose",
+    "Sneezing",
+    "Runny Nose",
+    "Cough",
+    "Postnasal discharge (Dripping at the back of your throat)",
+    "Thick nasal discharge (Snot)",
+    "Ear fullness",
+    "Dizziness",
+    "Ear pain",
+    "Facial Pain",
   ];
 
   const handleSubmit = () => {
@@ -39,13 +37,19 @@ const FirstScreen = ({ navigation }) => {
           <Text style={styles.subtitle}>Questions</Text>
           {questions.map((question, index) => (
             <View key={index} style={styles.question}>
-              <Text>{question}</Text>
+              <Text style={styles.questionText}>{question}</Text>
               <Text style={styles.rankText}>Rank From Numbers 1 - 5</Text>
-              <TextInput
-                style={styles.input}
-                keyboardType="numeric"
-                onChangeText={value => handleInputChange(index, value)}
-              />
+              <View style={styles.optionsContainer}>
+                {[1, 2, 3, 4, 5].map((option) => (
+                  <TouchableOpacity
+                    key={option}
+                    style={[styles.optionButton, answers[index] === option && styles.selectedOption]}
+                    onPress={() => handleSelectOption(index, option)}
+                  >
+                    <Text>{option}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
             </View>
           ))}
           <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
@@ -91,22 +95,30 @@ const styles = StyleSheet.create({
   question: {
     marginBottom: 10,
   },
-  rankText: {
-    color: '#888',
-    marginBottom: 5,
+  questionText: {
+    fontSize: 14,
+    marginBottom: 10,
   },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
+  optionsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  optionButton: {
+    backgroundColor: '#ddd',
     padding: 10,
-    marginTop: 5,
+    borderRadius: 5,
+    width: 40,
+    alignItems: 'center',
+  },
+  selectedOption: {
+    backgroundColor: '#063b94',
   },
   submitButton: {
     backgroundColor: '#063b94',
     paddingVertical: 10,
     borderRadius: 5,
     marginTop: 20,
+    alignItems: 'center',
   },
   submitButtonText: {
     color: '#fff',

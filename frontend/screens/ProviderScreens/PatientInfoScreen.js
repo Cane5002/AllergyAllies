@@ -11,7 +11,6 @@ const PatientInfoScreen = ({ navigation }) => {
   const [phone,setPhone ] = useState('');
   const [DoB,setDoB ] = useState('');
   const [height,setHeight ] = useState('');
-  // Add more state variables for other patient information fields
 
   const handleProceed = () => {
     navigation.navigate('FirstScreen');
