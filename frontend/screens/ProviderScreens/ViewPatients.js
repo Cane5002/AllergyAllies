@@ -57,6 +57,9 @@ export default function ViewPatients({ navigation }) {
     function handlePatientSelect(patient) {
         navigation.navigate('PatientDetails', { patient });
     }
+    function handleNewButtonPress() {
+        navigation.navigate('PatientInfoScreen');
+    }
 
     function updateRenderData() {
         let newList = []
@@ -111,6 +114,12 @@ export default function ViewPatients({ navigation }) {
                         inputStyles={{ color: "#7a7a7a" }}
                         dropdownStyles={styles.dropdownSelect}
                     />
+                    {/* New Button */}
+            <TouchableOpacity
+                style={styles.NewButton}
+                onPress={handleNewButtonPress}>
+                <Text style={styles.NewButtonText}> Add Patient </Text>
+            </TouchableOpacity>
                 </View>
                 <DataTable style={styles.table}>
                     <DataTable.Header style={styles.tableHeader}>
@@ -207,6 +216,20 @@ const styles = StyleSheet.create({
         borderRadius: 8,
     },
     ButtonText: {
+        color: 'white',
+        textAlign: 'center',
+        fontSize: 15,
+    },
+    // New Button Styles
+    NewButton: {
+        backgroundColor: 'green', // Example background color
+        padding: 10,
+        marginLeft: 20, // Adjust as needed
+        height: 30,
+        justifyContent: 'center',
+        borderRadius: 8,
+    },
+    NewButtonText: {
         color: 'white',
         textAlign: 'center',
         fontSize: 15,
