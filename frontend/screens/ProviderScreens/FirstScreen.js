@@ -13,16 +13,16 @@ const FirstScreen = ({ navigation }) => {
   };
 
   const questions = [
-    "Need to blow nose",
-    "Sneezing",
-    "Runny Nose",
-    "Cough",
-    "Postnasal discharge (Dripping at the back of your throat)",
-    "Thick nasal discharge (Snot)",
-    "Ear fullness",
-    "Dizziness",
-    "Ear pain",
-    "Facial Pain",
+    "1. Need to blow nose",
+    "2. Sneezing",
+    "3. Runny Nose",
+    "4. Cough",
+    "5. Postnasal discharge (Dripping at the back of your throat)",
+    "6. Thick nasal discharge (Snot)",
+    "7. Ear fullness",
+    "8. Dizziness",
+    "9. Ear pain",
+    "10. Facial Pain",
   ];
 
   const handleSubmit = () => {
