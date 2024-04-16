@@ -12,7 +12,7 @@ import ProviderSignInScreen from './screens/ProviderScreens/ProviderSignInScreen
 import LoadingScreen from './screens/LoadingScreen.js';
 import PatientSignUpScreen from './screens/signup/PatientSignUpScreen';
 import ProviderSignUpScreen from './screens/signup/ProviderSignUpScreen.js';
-import practiceEnrollment from './screens/signup/practiceEnrollment.js';
+import PracticeEnrollment from './screens/signup/practiceEnrollment.js';
 import PatientHome from './screens/PatientScreens/PatientHome.js';
 import Upcoming from './screens/PatientScreens/Upcoming.js';
 import InitialScreen from './screens/InitialScreen.js';
@@ -92,7 +92,7 @@ const InitialMobileStack = (
             />
     <Stack.Screen
               name="PracticeEnrollment"
-              component={practiceEnrollment}
+              component={PracticeEnrollment}
               options={{
                 title: 'Practice Enrollment',
                 headerTitleAlign: 'center',
@@ -148,7 +148,7 @@ const InitialDesktopStack = (
             />
             <Stack.Screen
               name="PracticeEnrollment"
-              component={practiceEnrollment}
+              component={PracticeEnrollment}
               options={{
                 title: 'Practice Enrollment',
                 headerTitleAlign: 'center',
@@ -183,7 +183,7 @@ const SignedInDesktopStack = (
       <Stack.Screen name="Upcoming" component={Upcoming} options={{title: 'Upcoming Appointment'}} />
       <Stack.Screen name="PatientSignUpScreen" component={PatientSignUpScreen} options={{title: 'Patient Sign Up'}} />
       <Stack.Screen name="ProviderSignUpScreen" component={ProviderSignUpScreen} options={{title: 'Provider Sign Up'}} />
-      <Stack.Screen name="PracticeEnrollmentScreen" component={practiceEnrollment} options={{ title: 'Practice Enrollment Screen'}} />
+      <Stack.Screen name="PracticeEnrollmentScreen" component={PracticeEnrollment} options={{ title: 'Practice Enrollment Screen'}} />
       <Stack.Screen name="PracticeSurvey" component={PracticeSurvey} />
       <Stack.Screen name="ViewPatients" component={ViewPatients} options={{ title: 'View Patients'}}/>
       <Stack.Screen name="Injections" component={Injections} options={{title: 'Injections'}} />

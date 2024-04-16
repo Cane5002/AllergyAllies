@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Dimensions, StyleSheet, TouchableOpacity } from 'react-native';
 import axios from 'axios';
 
-export default function PatientSignUpScreen() {
+export default function PracticeEnrollment() {
   var success = true;
   const [display, setDisplay] = useState('');
   const [practiceName, setName] = useState('');
-  const [providerNames, setProviderNames] = useState([]);
+  const [providerCount, setProviderCount] = useState(1);
+  const [providerNPIs, setProviderNPIs] = useState([]);
   const [phoneNumber, setPhoneNumber] = useState('');
   const [address, setAddress] = useState('');
   const [email, setEmail] = useState('');
@@ -17,11 +18,25 @@ export default function PatientSignUpScreen() {
   const handleEnrollment = async () => {
 
     setDisplay('')
-    if (practiceName && providerNames && phoneNumber && address && email && officeHours && allergyShotHours && practiceCode) {
+    if (practiceName && providerNPIs && phoneNumber && address && email && officeHours && allergyShotHours && practiceCode) {
         try {
+          console.log(providerNPIs);
+          for (let npi of providerNPIs) {
+            if (isNaN(parseInt(npi))) {
+              setDisplay(`Povider NPI ${npi} must be a number`);
+              success = false;
+              return;
+            }
+            if (npi.length != 10) {
+              setDisplay(`Povider NPI ${npi} must be 10 digits`);
+              success = false;
+              return;
+            }
+          }
+
           const data = {
             practiceName,
-            providerNames,
+            providerNPIs,
             phoneNumber,
             address,
             email,
@@ -29,20 +44,28 @@ export default function PatientSignUpScreen() {
             allergyShotHours,
             practiceCode
           }
+          
 
-          const practiceExists = await axios.get(`http://localhost:5000/api/practiceByName/${practiceName}`);
-          console.log(practiceExists.status);
+          const practiceNameExists = await axios.get(`http://localhost:5000/api/practiceByName/${practiceName}`);
+          console.log(practiceNameExists.status);
 
-          if (practiceExists.status === 201) {
-            const response = await axios.post('http://localhost:5000/api/addPractice', data);
-            console.log(response);
-          }
-          else if (practiceExists.status === 200) {
+          if (practiceNameExists.status === 200) {
             setDisplay('This practice is already enrolled!');
             success = false;
-            console.log(response);
+            return;
           }
 
+          const practiceCodeExists = await axios.get(`http://localhost:5000/api/practiceByCode/${practiceCode}`);
+          console.log(practiceCodeExists.status);
+
+          if (practiceCodeExists.status === 200) {
+            setDisplay('This Practice Code is already in use!');
+            success = false;
+            return;
+          }
+
+          const response = await axios.post('http://localhost:5000/api/addPractice', data);
+          console.log(response);
         }
         catch (error) {
           success = false;
@@ -56,7 +79,7 @@ export default function PatientSignUpScreen() {
     if (success) {
       setDisplay('Practice successfully enrolled!');
       setTimeout(() => {
-        navigation.navigate('SignIn');
+        navigation.navigate('ProviderSignUpScreen');
         }, 1000);
     }
   }
@@ -65,22 +88,43 @@ export default function PatientSignUpScreen() {
     <View style={styles.container}>
       <Text style={styles.title}>Allergy Ally</Text>
 
-        <TextInput style={styles.input}
-          underlineColorAndroid="transparent"
-          placeholder="Practice Name"
-          placeholderTextColor="#7a7a7a"
-          value={practiceName}
-          autoCapitalize="none"
-          onChangeText={setName} />
+      <TextInput style={styles.input}
+        underlineColorAndroid="transparent"
+        placeholder="Practice Name"
+        placeholderTextColor="#7a7a7a"
+        value={practiceName}
+        autoCapitalize="none"
+        onChangeText={setName} />
 
-        {/* NEEDS TO BE UPDATED TO A MULTI INPUT*/}
-        <TextInput style={styles.input}
+      <Text style={styles.subHeading}>Provider NPI's</Text>
+      {providerNPIs.map((npi, index) => (
+        <TextInput style={styles.inputNPI}
+          key = {index}
           underlineColorAndroid="transparent"
-          placeholder="Provider Name"
+          placeholder="Provider NPI"
           placeholderTextColor="#7a7a7a"
-          value={providerNames}
+          value={npi}
           autoCapitalize="none"
-          onChangeText={setProviderNames} />
+          onChangeText={(text) => setProviderNPIs((prevNPIs) => {
+              const updatedNPIs = [...prevNPIs];
+              updatedNPIs[index] = text;
+              return updatedNPIs;
+        })} />
+      ))}
+      <TouchableOpacity
+        style = {styles.addProviderButton}
+        onPress={() => setProviderNPIs((prevNPIs) => {
+          return [...prevNPIs, ''];
+        }) }>
+        <Text style = {styles.addProviderButtonText}>Add Provider</Text>
+      </TouchableOpacity>
+      {/* <TextInput style={styles.input}
+        underlineColorAndroid="transparent"
+        placeholder="Provider NPI"
+        placeholderTextColor="#7a7a7a"
+        value={providerNPIs}
+        autoCapitalize="none"
+        onChangeText={setProviderNPIs} /> */}
 
       <TextInput style={styles.input}
         underlineColorAndroid="transparent"
@@ -154,6 +198,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#1059d5',
   },
+  subHeading: {
+    textAlign: 'left',
+    fontSize: 15,
+    color: '#1059d5',
+  },
   message: {
     textAlign: 'center',
     fontSize: 12,
@@ -175,6 +224,28 @@ const styles = StyleSheet.create({
     borderColor: '#1059d5',
     borderWidth: 1,
     padding: 10
+  },
+  inputNPI: {
+    margin: 5,
+    height: 40,
+    width: height > width ? null : 136,
+    borderColor: '#1059d5',
+    borderWidth: 1,
+    padding: 10
+  },
+  addProviderButton: {
+    backgroundColor: '#1059d5',
+    width: height > width ? null : 136,
+    padding: 10,
+    margin: 5,
+    height: 20,
+    justifyContent: 'center',
+    borderRadius: 8,
+  },
+  addProviderButtonText: {
+    color: 'white',
+    textAlign: 'center',
+    fontSize: 10,
   },
   logInButton: {
     backgroundColor: '#1059d5',

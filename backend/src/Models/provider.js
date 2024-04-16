@@ -34,7 +34,7 @@ const dataSchema = new mongoose.Schema({
     },
     NPI: {
         required: true,
-        type: Number
+        type: String
     },
     practiceID: {
         required: false,
