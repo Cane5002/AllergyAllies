@@ -46,19 +46,19 @@ export default function PracticeEnrollment() {
           }
           
 
-          const practiceExists = await axios.get(`http://localhost:5000/api/practiceByName/${practiceName}`);
-          console.log(practiceExists.status);
+          const practiceNameExists = await axios.get(`http://localhost:5000/api/practiceByName/${practiceName}`);
+          console.log(practiceNameExists.status);
 
-          if (practiceExists.status === 200) {
+          if (practiceNameExists.status === 200) {
             setDisplay('This practice is already enrolled!');
             success = false;
             return;
           }
 
-          practiceExists = await axios.get(`http://localhost:5000/api/practiceByCode/${practiceCode}`);
-          console.log(practiceExists.status);
+          const practiceCodeExists = await axios.get(`http://localhost:5000/api/practiceByCode/${practiceCode}`);
+          console.log(practiceCodeExists.status);
 
-          if (practiceExists.status === 200) {
+          if (practiceCodeExists.status === 200) {
             setDisplay('This Practice Code is already in use!');
             success = false;
             return;

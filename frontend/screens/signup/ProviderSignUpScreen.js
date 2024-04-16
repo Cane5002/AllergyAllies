@@ -17,17 +17,30 @@ export default function ProviderSignUpScreen() {
   const handleSignUp = async () => {
 
       if (firstName && lastName && email && password && confirmPass && NPI && practiceCode) { 
-      const practice = await axios.get(`http://localhost:5000/api/practiceByCode/${practiceCode}`);
-
-      const practiceID = practice.data._id;
-      console.log(practiceID)
-      /*
-      if (!practiceID) {
+      const practiceByCode = await axios.get(`http://localhost:5000/api/practiceByCode/${practiceCode}`);
+      
+      if (practiceByCode.status != 200) {
         setDisplay('Invalid Practice ID');
         success = false;
         return;
       }
-      */
+
+      const practiceID = practiceByCode.data._id;
+      console.log(practiceID)
+
+      const practice = await axios.get(`http:/localhost:5000/api/practice/${practiceID}`);
+      if (!practice.data.ProviderNPIs) {
+        setDisplay('Error accessing your practice');
+        success = false;
+        return;
+      }
+      if (!practice.data.ProviderNPIs.includes(NPI)) {
+        setDisplay('Your NPI not registered with this practice');
+        success = false;
+        return;
+      }
+
+      
       // Check password complexity
       if (password.length < 12 || !/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/\d/.test(password) || !/[^A-Za-z0-9]/.test(password)) {
         setDisplay('Password must be at least 12 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.');
@@ -49,31 +62,21 @@ export default function ProviderSignUpScreen() {
           //const NPIreigstryURI = `https://npiregistry.cms.hhs.gov/api/?number=${NPI}&pretty=&version=2.1`
           const NPIreigstryURI = `https://clinicaltables.nlm.nih.gov/api/npi_org/v3/search?terms=${NPI}`
           //const NPIexists = await axios.get(NPIreigstryURI);
-
+          */
           // Check if the email already has an associated account
           const emailNPIExists = await axios.post('http://localhost:5000/api/getProviderEmail', { email, NPI });
 
-          if (emailNPIExists.status === 200) {
-            const response = await axios.post('http://localhost:5000/api/addProvider', data);
-            
-            if (NPIexists.data[0] == 1) {
-              const response = await axios.post('http://localhost:5000/api/addProvider', data);
-            }
-            else {
-              setDisplay('Invalid NPI')
-              success = false;
-            }
-            
-          }
-          else if (emailNPIExists.status === 201) {
+          if (emailNPIExists.status === 201) {
             setDisplay('This email is already associated with an account!');
             success = false;
+            return;
           }
           else if (emailNPIExists.status === 208) {
-            setDisplay('This NPI cannot be used.');
+            setDisplay('Please confirm that this is your NPI');
             success = false;
+            return;
           }
-          */
+          
           const response = await axios.post('http://localhost:5000/api/addProvider', data);
           console.log(response);
         }
