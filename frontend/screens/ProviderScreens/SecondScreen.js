@@ -1,34 +1,40 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
 
 const SecondScreen = ({ navigation, route }) => {
-  const [answers, setAnswers] = useState(Array(10).fill(''));
+  const { answers } = route.params;
+  const [additionalAnswers, setAdditionalAnswers] = useState(Array(10).fill(0));
+  const [allQuestionsAnswered, setAllQuestionsAnswered] = useState(false);
 
-  const handleInputChange = (index, value) => {
-    if (!isNaN(value) && value >= 1 && value <= 5) {
-      setAnswers(prevAnswers => {
-        const newAnswers = [...prevAnswers];
-        newAnswers[index] = value;
-        return newAnswers;
-      });
-    }
+  useEffect(() => {
+    const areAllQuestionsAnswered = additionalAnswers.every(answer => answer !== 0);
+    setAllQuestionsAnswered(areAllQuestionsAnswered);
+  }, [additionalAnswers]);
+
+  const handleSelectOption = (index, value) => {
+    setAdditionalAnswers(prevAnswers => {
+      const newAnswers = [...prevAnswers];
+      newAnswers[index] = value;
+      return newAnswers;
+    });
   };
 
-  const questions = [
-    "Question 11: Difficulty falling asleep",
-    "Question 12: Waking up at night",
-    "Question 13: Lack of a good night's sleep",
-    "Question 14: Waking up tired",
-    "Question 15: Fatigue",
-    "Question 16: Reduced productivity",
-    "Question 17: Reduced concentration",
-    "Question 18: Frustrated/restless/irritable",
-    "Question 19: Sad",
-    "Question 20: Embarrassed",
+  const additionalQuestions = [
+    "11. Difficulty falling asleep",
+    "12. Waking up at night",
+    "13. Lack of a good night's sleep",
+    "14. Waking up tired",
+    "15. Fatigue",
+    "16. Reduced productivity",
+    "17. Reduced concentration",
+    "18. Frustrated/restless/irritable",
+    "19. Sad",
+    "20. Embarrassed",
   ];
 
   const handleSubmit = () => {
-    navigation.navigate('SubmitScreen', { answers });
+    const combinedAnswers = [...answers, ...additionalAnswers];
+    navigation.navigate('SubmitScreen', { combinedAnswers });
   };
 
   return (
@@ -37,18 +43,28 @@ const SecondScreen = ({ navigation, route }) => {
         <Text style={styles.title}>SNOT SURVEY (Page 2)</Text>
         <View style={styles.card}>
           <Text style={styles.subtitle}>Questions</Text>
-          {questions.map((question, index) => (
+          {additionalQuestions.map((question, index) => (
             <View key={index} style={styles.question}>
-              <Text>{question}</Text>
+              <Text style={styles.questionText}>{question}</Text>
               <Text style={styles.rankText}>Rank From Numbers 1 - 5</Text>
-              <TextInput
-                style={styles.input}
-                keyboardType="numeric"
-                onChangeText={value => handleInputChange(index, value)}
-              />
+              <View style={styles.optionsContainer}>
+                {[1, 2, 3, 4, 5].map((option) => (
+                  <TouchableOpacity
+                    key={option}
+                    style={[styles.optionButton, additionalAnswers[index] === option && styles.selectedOption]}
+                    onPress={() => handleSelectOption(index, option)}
+                  >
+                    <Text>{option}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
             </View>
           ))}
-          <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+          <TouchableOpacity
+            style={[styles.submitButton, !allQuestionsAnswered && styles.disabledButton]}
+            onPress={handleSubmit}
+            disabled={!allQuestionsAnswered}
+          >
             <Text style={styles.submitButtonText}>Submit</Text>
           </TouchableOpacity>
         </View>
@@ -76,14 +92,14 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   title: {
-    fontSize: 24,
+    fontSize: 32,
     fontWeight: 'bold',
     color: '#063b94',
     marginBottom: 20,
     textAlign: 'center',
   },
   subtitle: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 10,
     color: '#063b94',
@@ -91,18 +107,34 @@ const styles = StyleSheet.create({
   question: {
     marginBottom: 10,
   },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
+  questionText: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  optionsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  optionButton: {
+    backgroundColor: '#ddd',
     padding: 10,
-    marginTop: 5,
+    borderRadius: 5,
+    width: 40,
+    alignItems: 'center',
+  },
+  selectedOption: {
+    backgroundColor: '#0b92d6',
   },
   submitButton: {
     backgroundColor: '#063b94',
     paddingVertical: 10,
     borderRadius: 5,
     marginTop: 20,
+    alignItems: 'center',
+  },
+  disabledButton: {
+    opacity: 0.5,
   },
   submitButtonText: {
     color: '#fff',

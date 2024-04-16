@@ -5,12 +5,12 @@ const SubmitScreen = ({ navigation, route }) => {
   const { answers } = route.params;
 
   const handleReturnToFirstPage = () => {
-    navigation.popToTop(); // Return to the first page
+    navigation.popToTop();
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Thank you! You have successfully submitted!</Text>
+      <Text style={styles.title}>Thank you! Patient information successfully recorded!</Text>
       <TouchableOpacity style={styles.returnButton} onPress={handleReturnToFirstPage}>
         <Text style={styles.returnButtonText}>Finished</Text>
       </TouchableOpacity>
