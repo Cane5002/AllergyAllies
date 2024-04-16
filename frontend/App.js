@@ -21,6 +21,11 @@ import ViewPatients from './screens/ProviderScreens/ViewPatients.js';
 
 import ViewAllAppointments from './screens/PatientScreens/ViewAllAppointments.js';
 import PatientDetails from './screens/ProviderScreens/PatientDetails.js';
+import PatientInfoScreen from './screens/ProviderScreens/PatientInfoScreen.js';
+import FirstScreen from './screens/ProviderScreens/FirstScreen.js';
+import SecondScreen from './screens/ProviderScreens/SecondScreen.js';
+import SubmitScreen from './screens/ProviderScreens/SubmitScreen.js';
+
 
 import { useMemo, useReducer, useEffect } from 'react';
 //import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -186,6 +191,10 @@ const SignedInDesktopStack = (
       <Stack.Screen name="PatientDetails" component={PatientDetails} options={{title: 'Patient Details'}} />
       <Stack.Screen name= "ViewAllAppointments" component={ViewAllAppointments} options={{title: 'ViewAllAppointments', headerBackTitleVisible: false}} />
       <Stack.Screen name="InjectionInfo" component={InjectionInfo} options={{title: 'InjectionInfo', headerBackTitleVisible: false}} />
+      <Stack.Screen name="PatientInfoScreen" component={PatientInfoScreen} options={{ title: 'Patient Information' }} />
+      <Stack.Screen name="FirstScreen" component={FirstScreen} options={{ title: 'Snot Survey' }} />
+      <Stack.Screen name="SecondScreen" component={SecondScreen} options={{ title: 'Snot Survey' }} />
+      <Stack.Screen name="SubmitScreen" component={SubmitScreen} options={{ title: 'Confirmation Screen' }} />
   </>
 );
 
