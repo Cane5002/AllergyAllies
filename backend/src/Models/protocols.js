@@ -1,11 +1,6 @@
 const mongoose = require('mongoose');
 
 const nextDoseAdjustments = new mongoose.Schema({
-    // also known as injection frequency
-    injectionInterval: { // Num days before considered missed
-        required: true,
-        type: Number,
-    },
     startingInjectionVol: {
         required: true,
         type: Number,
@@ -22,98 +17,26 @@ const nextDoseAdjustments = new mongoose.Schema({
 
 // may need multiple of these, for different missedDays values
 const missedDoseAdjustments = new mongoose.Schema ({
-    doseAdjustMissedDays: {
+    daysMissed: {
         required: true,
         type: Number,
     },
-    range1: {
-        days: {
-            required: true,
-            type: Number,
-        },
-        event: {
-            required: true,
-            type: String
-        },
-        injectionVolumeDecrease: {
-            required: true,
-            type: Number,
-        },
-        decreaseVialConcentration: {
-            required: true,
-            type: Number,
-        },
-        decreaseBottleNumber: {
-            required: true,
-            type: Number,
-        },
+    action: {
+        required: true,
+        type: String
     },
-    range2: {
-        days: {
-            required: true,
-            type: Number,
-        },
-        event: {
-            required: true,
-            type: String
-        },
-        injectionVolumeDecrease: {
-            required: true,
-            type: Number,
-        },
-        decreaseVialConcentration: {
-            required: true,
-            type: Number,
-        },
-        decreaseBottleNumber: {
-            required: true,
-            type: Number,
-        },
+    injectionVolumeDecrease: {
+        required: true,
+        type: Number,
     },
-    range3: {
-        days: {
-            required: true,
-            type: Number,
-        },
-        event: {
-            required: true,
-            type: String
-        },
-        injectionVolumeDecrease: {
-            required: true,
-            type: Number,
-        },
-        decreaseVialConcentration: {
-            required: true,
-            type: Number,
-        },
-        decreaseBottleNumber: {
-            required: true,
-            type: Number,
-        },
+    decreaseVialConcentration: {
+        required: true,
+        type: Number,
     },
-    range4: {
-        days: {
-            required: true,
-            type: Number,
-        },
-        event: {
-            required: true,
-            type: String
-        },
-        injectionVolumeDecrease: {
-            required: true,
-            type: Number,
-        },
-        decreaseVialConcentration: {
-            required: true,
-            type: Number,
-        },
-        decreaseBottleNumber: {
-            required: true,
-            type: Number,
-        },
-    }
+    decreaseBottleNumber: {
+        required: true,
+        type: Number,
+    },
 })
 
 // dose adjustments for skin reactions to medicine
@@ -122,7 +45,7 @@ const largeReactionsDoseAdjustments = new mongoose.Schema({
         required: true,
         type: Number,
     },
-    event: {
+    action: {
         required: true,
         type: String
     },
@@ -145,9 +68,13 @@ const vialTestReactionAdjustments = new mongoose.Schema({
         required: true,
         type: Number,
     },
-    event: {
+    action: {
         required: true,
         type: String
+    },
+    decreaseInjectionVol: {
+        required: true,
+        type: Number,
     },
     adjustVialConcentration: {
         required: true,
@@ -169,8 +96,6 @@ const bottleSchema = new mongoose.Schema({
         require: true,
         type: Number
     },
-    //missedDoseAdjustment: missedDoseAdjustments,
-    largeReactionsDoseAdjustment: largeReactionsDoseAdjustments,
 })
 
 const injectionFrequency = new mongoose.Schema({
@@ -190,19 +115,12 @@ const dataSchema = new mongoose.Schema({
         required: true,
         type: String
     },
-    NPI: {
-        required: false,
-        type: String
-    },
-    appointmentSchedule: {
-        required: false,
-        type: String
-    },
     nextDoseAdjustment: nextDoseAdjustments,
     largeReactionsDoseAdjustment: largeReactionsDoseAdjustments,
     bottles: [bottleSchema],
     vialTestReactionAdjustment: vialTestReactionAdjustments,
-    missedDoseAdjustment: missedDoseAdjustments,
+    triggers: Array,
+    missedDoseAdjustment: [missedDoseAdjustments],
     largeReactionsDoseAdjustment: largeReactionsDoseAdjustments,
     injectionFrequency: injectionFrequency  
 }, { collection: 'Protocols' })

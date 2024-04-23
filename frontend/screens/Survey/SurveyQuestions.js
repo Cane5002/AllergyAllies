@@ -9,64 +9,96 @@ export default {
              ********** PRACTICE INFO ************* 
              *************************************/
             {
-                name: 'Practice Info',
+                name: 'practiceInfo',
                 title: 'Practice Information',
                 elements:
                     [
                         {
-                            name: 'a',
+                            name: 'practiceName',
                             title: 'Practice Name',
                             type: 'text',
 
                         },
                         {
-                            name: 'b',
-                            title: 'Treating Physician/Provider Name',
-                            type: 'dropdown'
-                        },
-                        {
-                            name: 'c',
-                            title: 'Practice Logo',
-                            type: 'file',
-                        },
-                        {
-                            name: 'd',
-                            title: 'Practice Scrolling Ads',
-                            type: 'file',
-                        },
-                        {
-                            name: 'e',
+                            name: 'address',
                             title: 'Practice Address',
                             type: 'text',
 
+                        },
+                        {
+                            name: 'email',
+                            title: 'Email',
+                            type: 'text',
+                        },
+                        {
+                            name: 'phone',
+                            title: 'Phone Number',
+                            type: 'text',
+                        },
+                        {
+                            name: 'officeHours',
+                            title: 'Office Hours',
+                            type: 'text',
+                        },
+                        {
+                            name: 'shotHours',
+                            title: 'Allergy Shot Hours',
+                            type: 'text',
                         }
                     ],
                 showQuestionNumbers: 'false'
             },
             /**************************************
+             ************** STAFF **************** 
+             *************************************/
+            {
+                name: 'staff',
+                title: 'Staff',
+                elements: [
+                    {
+                        name: 'staffList',
+                        title: 'Staff',
+                        type: 'matrixdynamic',
+                        addRowText: 'Add Staff',
+                        columns: [
+                            {
+                                name: 'NPI',
+                                title: 'NPI',
+                                cellType: 'text',
+                                minLength: 10,
+                                maxLength: 10,
+                                validators: [
+                                    { type: 'numeric', text: 'Value must e a number'}
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            /**************************************
              ************ PROTOCOLS *************** 
              *************************************/
             {
-                name: 'Protocols',
+                name: 'protocols',
                 title: 'Protocols',
                 elements:
                     [
                         {   
-                            name: 'f',
-                            title: 'Starting frequency of injections',
+                            name: 'frequency',
+                            title: 'Injection Frequency',
                             type: 'panel',
                             elements: [
                                 {
                                     type: "text",
                                     inputType: 'number',
-                                    name: "f1",
+                                    name: "count",
                                     title: "Injections",
                                     titleLocation: 'hidden',
                                     defaultValue: '2',
                                 },
                                 {
                                     type: "dropdown",
-                                    name: "f2",
+                                    name: "interval",
                                     title: 'Injections',
                                     titleLocation: "left",
                                     choices: [ 'Weekly', 'Monthly'],
@@ -74,77 +106,31 @@ export default {
                                     startWithNewLine: false
                                 }
                             ]
-                        }, {
-                            name: 'g',
-                            title: 'Frequency of Clinical Follow-up Appointments',
-                            type: 'panel',
-                            elements: [
-                                {
-                                    type: "text",
-                                    inputType: 'number',
-                                    name: "g1",
-                                    title: "Injections",
-                                    titleLocation: 'hidden',
-                                    defaultValue: '2',
-                                },
-                                {
-                                    type: "dropdown",
-                                    name: "g2",
-                                    title: 'Injections',
-                                    titleLocation: "left",
-                                    choices: [ 'Monthly', 'Yearly'],
-                                    defaultValue: 'Yearly',
-                                    startWithNewLine: false
-                                }
-                            ]
-                        }, {
-                            name: 'h',
-                            title: 'Frequency of Progress Self-Assessment',
-                            type: 'panel',
-                            elements: [
-                                {
-                                    type: "text",
-                                    inputType: 'number',
-                                    name: "h1",
-                                    title: "Injections",
-                                    titleLocation: 'hidden',
-                                    defaultValue: '2',
-                                },
-                                {
-                                    type: "dropdown",
-                                    name: "h2",
-                                    title: 'Injections',
-                                    titleLocation: "left",
-                                    choices: [ 'Monthly', 'Yearly'],
-                                    defaultValue: 'Yearly',
-                                    startWithNewLine: false
-                                }
-                            ]
                         }
                     ]
             },
             /**************************************
-             ************ TREATMENT *************** 
+             ************** VIALS ***************** 
              *************************************/
             {
-                name: 'Treatment',
-                title: 'Treatment',
+                name: 'vials',
+                title: 'Vials',
                 elements:
                     [
                         {
-                            name: 'j',
+                            name: 'treatmentVials',
                             title: 'Treatment Vials',
                             type: 'paneldynamic',
                             panelCount: '0',
                             maxPanelCount: '100',
                             confirmDelete: 'true',
                             templateElements: [{
-                                name: 'j1',
+                                name: 'bottleName',
                                 title: 'Vial Name',
                                 type: 'text',
                             },
                             {
-                                name: 'j2',
+                                name: 'shelfLife',
                                 title: 'Shelf Life (months)',
                                 type: 'text',
                                 inputType: 'numeric',
@@ -156,52 +142,20 @@ export default {
                     ]
             },
             /**************************************
-             ************* ANTIGENS *************** 
-             *************************************/
-            {
-                name: 'Antigens',
-                title: 'Antigens',
-                elements:
-                    [
-                        {
-                            name: 'i',
-                            title: 'Antigens Tested',
-                            type: 'paneldynamic',
-                            panelCount: '0',
-                            maxPanelCount: '100',
-                            confirmDelete: 'true',
-                            templateElements: [{
-                                name: 'i1',
-                                title: 'Antigen Name',
-                                type: 'text',
-                            }
-                            ]
-                        }
-                    ]
-            },
-            /**************************************
              ********* DOSE ADJUSTMENTS *********** 
              *************************************/
             {
-                name: 'Dose Adjustments',
+                name: 'doseAdjustments',
                 title: 'Dose Adjustments',
                 elements:
                     [
                         {
-                            name: 'k',
+                            name: 'doseAdvancement',
                             title: 'Automatic Dose Advancements',
                             type: 'panel',
-                            elements: [{
-                                name: 'k1',
-                                title: 'Automatic',
-                                type: 'radiogroup',
-                                colCount: '3',
-                                defaultValue: 'Default',
-                                choices: ['Default', 'Customize', 'Disable'],
-                                seperateSpecialChoices: 'true'
-                            },
+                            elements: [
                             {
-                                name: 'k2',
+                                name: 'initialVolume',
                                 title: 'Initial Injection Volume (ml)',
                                 type: 'text',
                                 inputType: 'numeric',
@@ -209,12 +163,10 @@ export default {
                                 min: '0',
                                 max: '10',
                                 default: '0.05',
-                                enableIf: "{k1} = 'Customize'",
                                 defaultValue: '0.05',
-                                visibleIf: "{k1} != 'Disable'"
                             },
                             {
-                                name: 'k3',
+                                name: 'advancementIncrement',
                                 title: 'Volume Increment (ml)',
                                 type: 'text',
                                 inputType: 'numeric',
@@ -222,12 +174,10 @@ export default {
                                 min: '0',
                                 max: '0.50',
                                 default: '0.05',
-                                enableIf: "{k1} = 'Customize'",
                                 defaultValue: '0.05',
-                                visibleIf: "{k1} != 'Disable'"
                             },
                             {
-                                name: 'k4',
+                                name: 'maxVolume',
                                 title: 'Max Injection Volume (ml)',
                                 type: 'text',
                                 inputType: 'numeric',
@@ -235,401 +185,166 @@ export default {
                                 min: '0',
                                 max: '10',
                                 default: '0.50',
-                                enableIf: "{k1} = 'Customize'",
                                 defaultValue: '0.50',
-                                visibleIf: "{k1} != 'Disable'"
                             }
                             ]
 
                         }, {
-                            name: 'l',
-                            title: 'General Rules for Dose Adjustments',
+                            name: 'conditionalAdjustment',
+                            title: 'Conditional Dose Adjustments',
                             type: 'panel',
                             elements:
                                 [
                                     {
-                                        name: 'l1',
-                                        title: 'Automatic',
-                                        type: 'radiogroup',
-                                        colCount: '3',
-                                        defaultValue: 'Default',
-                                        choices: ['Default', 'Customize', 'Disable'],
-                                        seperateSpecialChoices: 'true'
-                                    },
-                                    {
-                                        name: 'l2',
+                                        name: 'triggers',
                                         title: 'What events trigger a dose adjustment?',
                                         type: 'checkbox',
-                                        visibleIf: "{l1} != 'Disable'",
-                                        enableIf: "{l1} = 'Customize'",
                                         defaultValue: ['Missed Injection Adjustment', 'Large Local Reaction', 'Vial Test Reaction'],
                                         choices: ['Missed Injection Adjustment', 'Large Local Reaction', 'Vial Test Reaction']
                                     },
                                     {
-                                        name: 'l3',
+                                        name: 'missedAdjustment',
                                         title: 'Missed Injection Adjustment',
-                                        type: 'panel',
-                                        visibleIf: '{l2} contains "Missed Injection Adjustment"',
-                                        elements:
-                                            [
-                                                {
-                                                    name: 'l31',
-                                                    title: 'What is the maximum number of days a patient can be late on an injection before a dose adjustment is required?',
-                                                    type: 'text',
-                                                    inputType: 'numeric',
-                                                    placeholder: '10',
-                                                    min: '0',
-                                                    max: '30',
-                                                    default: '10',
-                                                    enableIf: "{l1} = 'Customize'",
-                                                    defaultValue: '10',
-                                                    visibleIf: "{l1} != 'Disable'"
-                                                },
-                                                {
-                                                    name: 'l3a',
-                                                    title: 'For the following, please specify date ranges, beyond {l31} days for which the dose should be adjusted',
-                                                    type: 'panel',
-                                                    enableIf: "{l1} = 'Customize'",
-                                                    visibleIf: "{l1} != 'Disable'",
-                                                    elements:
-                                                        [
-                                                            {
-                                                                type: 'panel',
-                                                                name: 'Range 1',
-                                                                title: 'Range 1',
-                                                                elements: [
-                                                                    {
-                                                                        name: 'l3a1',
-                                                                        title: 'Start',
-                                                                        type: 'text',
-                                                                        inputType: 'numeric',
-                                                                        defaultValueExpression: '{l31} + 1'
-                                                                    },
-                                                                    {
-                                                                        name: 'l3a2',
-                                                                        title: 'End',
-                                                                        startWithNewLine: 'false',
-                                                                        type: 'text',
-                                                                        inputType: 'numeric',
-                                                                        defaultValueExpression: '{l31} + 3'
-                                                                    },
-                                                                    {
-                                                                        name: 'l3a3',
-                                                                        title: 'Action to Take',
-                                                                        type: 'radiogroup',
-                                                                        colCount: '3',
-                                                                        defaultValue: 'Decrease Injection Volume',
-                                                                        choices: ['Decrease Injection Volume', 'Dilute Vial', 'Reduce Bottle Number'],
-                                                                    },
-                                                                    {
-                                                                        name:'l3a31',
-                                                                        title: 'Decrease volume (ml)',
-                                                                        type: 'text',
-                                                                        inputType: 'numeric',
-                                                                        defaultValue: '0.05',
-                                                                        visibleIf: '{l3a3} == "Decrease Injection Volume"'
-                                                                    },
-                                                                    {
-                                                                        name:'l3a32',
-                                                                        title: 'How many times should the vial be diluted?',
-                                                                        type: 'text',
-                                                                        inputType: 'numeric',
-                                                                        defaultValue: '1',
-                                                                        visibleIf: '{l3a3} == "Dilute Vial"'
-                                                                    },
-                                                                    {
-                                                                        name:'l3a33',
-                                                                        title: 'Reduce bottle number by:',
-                                                                        type: 'text',
-                                                                        inputType: 'numeric',
-                                                                        defaultValue: '1',
-                                                                        visibleIf: '{l3a3} == "Reduce Bottle Number"'
-                                                                    }
-                                                                ]
-                                                            },
-                                                            {
-                                                                type: 'panel',
-                                                                name: 'Range 2',
-                                                                title: 'Range 2',
-                                                                startWithNewLine: 'false',
-                                                                elements: [
-                                                                    {
-                                                                        name: 'l3b1',
-                                                                        title: 'Start',
-                                                                        type: 'text',
-                                                                        inputType: 'numeric',
-                                                                        defaultValueExpression: '{l3a2} + 1'
-                                                                    },
-                                                                    {
-                                                                        name: 'l3b2',
-                                                                        title: 'End',
-                                                                        startWithNewLine: 'false',
-                                                                        type: 'text',
-                                                                        inputType: 'numeric',
-                                                                        defaultValueExpression: '{l3a2} + 7'
-                                                                    },
-                                                                    {
-                                                                        name: 'l3b3',
-                                                                        title: 'Action to Take',
-                                                                        type: 'radiogroup',
-                                                                        colCount: '3',
-                                                                        defaultValue: 'Decrease Injection Volume',
-                                                                        choices: ['Decrease Injection Volume', 'Dilute Vial', 'Reduce Bottle Number'],
-                                                                    },
-                                                                    {
-                                                                        name:'l3b31',
-                                                                        title: 'Decrease volume (ml)',
-                                                                        type: 'text',
-                                                                        inputType: 'numeric',
-                                                                        defaultValue: '0.10',
-                                                                        visibleIf: '{l3b3} == "Decrease Injection Volume"'
-                                                                    },
-                                                                    {
-                                                                        name:'l3b32',
-                                                                        title: 'How many times should the vial be diluted?',
-                                                                        type: 'text',
-                                                                        inputType: 'numeric',
-                                                                        defaultValue: '2',
-                                                                        visibleIf: '{l3b3} == "Dilute Vial"'
-                                                                    },
-                                                                    {
-                                                                        name:'l3b33',
-                                                                        title: 'Reduce bottle number by:',
-                                                                        type: 'text',
-                                                                        inputType: 'numeric',
-                                                                        defaultValue: '2',
-                                                                        visibleIf: '{l3b3} == "Reduce Bottle Number"'
-                                                                    }
-                                                                ]
-                                                            },
-                                                            {
-                                                                type: 'panel',
-                                                                name: 'Range 3',
-                                                                title: 'Range 3',
-                                                                elements: [
-                                                                    {
-                                                                        name: 'l3c1',
-                                                                        title: 'Start',
-                                                                        type: 'text',
-                                                                        inputType: 'numeric',
-                                                                        defaultValueExpression: '{l3b2} + 1'
-                                                                    },
-                                                                    {
-                                                                        name: 'l3c2',
-                                                                        title: 'End',
-                                                                        startWithNewLine: 'false',
-                                                                        type: 'text',
-                                                                        inputType: 'numeric',
-                                                                        defaultValueExpression: '{l3b2} + 7'
-                                                                    },
-                                                                    {
-                                                                        name: 'l3c3',
-                                                                        title: 'Action to Take',
-                                                                        type: 'radiogroup',
-                                                                        colCount: '3',
-                                                                        defaultValue: 'Decrease Injection Volume',
-                                                                        choices: ['Decrease Injection Volume', 'Dilute Vial', 'Reduce Bottle Number'],
-                                                                    },
-                                                                    {
-                                                                        name:'l3c31',
-                                                                        title: 'Decrease volume (ml)',
-                                                                        type: 'text',
-                                                                        inputType: 'numeric',
-                                                                        defaultValue: '0.15',
-                                                                        visibleIf: '{l3c3} == "Decrease Injection Volume"'
-                                                                    },
-                                                                    {
-                                                                        name:'l3c32',
-                                                                        title: 'How many times should the vial be diluted?',
-                                                                        type: 'text',
-                                                                        inputType: 'numeric',
-                                                                        defaultValue: '3',
-                                                                        visibleIf: '{l3c3} == "Dilute Vial"'
-                                                                    },
-                                                                    {
-                                                                        name:'l3c33',
-                                                                        title: 'Reduce bottle number by:',
-                                                                        type: 'text',
-                                                                        inputType: 'numeric',
-                                                                        defaultValue: '3',
-                                                                        visibleIf: '{l3c3} == "Reduce Bottle Number"'
-                                                                    }
-                                                                ]
-                                                            },
-                                                            {
-                                                                type: 'panel',
-                                                                name: 'Range 4',
-                                                                title: 'Range 4',
-                                                                startWithNewLine: 'false',
-                                                                elements: [
-                                                                    {
-                                                                        name:'l3d11',
-                                                                        title: 'Restart patient treatment past this day?',
-                                                                        type: 'boolean',
-                                                                        defaultValue: 'true'
-                                                                    },
-                                                                    {
-                                                                        name: 'l3d1',
-                                                                        title: 'Start',
-                                                                        type: 'text',
-                                                                        inputType: 'numeric',
-                                                                        defaultValueExpression: '{l3c2} + 1'
-                                                                    },
-                                                                    {
-                                                                        name: 'l3d2',
-                                                                        title: 'End',
-                                                                        startWithNewLine: 'false',
-                                                                        type: 'text',
-                                                                        inputType: 'numeric',
-                                                                        defaultValueExpression: '{l3c2} + 7'
-                                                                    },
-                                                                    {
-                                                                        name: 'l3d3',
-                                                                        title: 'Action to Take',
-                                                                        type: 'radiogroup',
-                                                                        colCount: '3',
-                                                                        defaultValue: 'Decrease Injection Volume',
-                                                                        choices: ['Decrease Injection Volume', 'Dilute Vial', 'Reduce Bottle Number'],
-                                                                    },
-                                                                    {
-                                                                        name:'l3d31',
-                                                                        title: 'Decrease volume (ml)',
-                                                                        type: 'text',
-                                                                        inputType: 'numeric',
-                                                                        defaultValue: '0.2',
-                                                                        visibleIf: '{l3d3} == "Decrease Injection Volume"'
-                                                                    },
-                                                                    {
-                                                                        name:'l3d32',
-                                                                        title: 'How many times should the vial be diluted?',
-                                                                        type: 'text',
-                                                                        inputType: 'numeric',
-                                                                        defaultValue: '4',
-                                                                        visibleIf: '{l3d3} == "Dilute Vial"'
-                                                                    },
-                                                                    {
-                                                                        name:'l3d33',
-                                                                        title: 'Reduce bottle number by:',
-                                                                        type: 'text',
-                                                                        inputType: 'numeric',
-                                                                        defaultValue: '4',
-                                                                        visibleIf: '{l3d3} == "Reduce Bottle Number"'
-                                                                    }
-                                                                ]
-                                                            },
-                                                        ]
-                                                }
-                                            ],
+                                        visibleIf: '{triggers} contains "Missed Injection Adjustment"',
+                                        type: 'paneldynamic',
+                                        panelCount: '0',
+                                        maxPanelCount: '100',
+                                        confirmDelete: 'true',
+                                        templateElements: [
+                                            {
+                                                name: 'daysMissed',
+                                                title: 'Days Missed',
+                                                startWithNewLine: 'false',
+                                                type: 'text',
+                                                inputType: 'numeric',
+                                            },
+                                            {
+                                                name: 'action',
+                                                title: 'Action to Take',
+                                                type: 'radiogroup',
+                                                colCount: '3',
+                                                defaultValue: 'Decrease Injection Volume',
+                                                choices: ['Decrease Injection Volume', 'Dilute Vial', 'Reduce Bottle Number'],
+                                            },
+                                            {
+                                                name:'injectionVolumeDecrease',
+                                                title: 'Decrease volume (ml)',
+                                                type: 'text',
+                                                inputType: 'numeric',
+                                                defaultValue: '0.05',
+                                                visibleIf: '{panel.action} == "Decrease Injection Volume"'
+                                            },
+                                            {
+                                                name:'decreaseVialConcentration',
+                                                title: 'How many times should the vial be diluted?',
+                                                type: 'text',
+                                                inputType: 'numeric',
+                                                defaultValue: '1',
+                                                visibleIf: '{panel.action} == "Dilute Vial"'
+                                            },
+                                            {
+                                                name:'decreaseBottleNumber',
+                                                title: 'Reduce bottle number by:',
+                                                type: 'text',
+                                                inputType: 'numeric',
+                                                defaultValue: '1',
+                                                visibleIf: '{panel.action} == "Reduce Bottle Number"'
+                                            }
+                                        ]
                                     },
-                                    
                                     {
-                                        name: 'l4',
+                                        name: 'largeReactionAdjustment',
                                         title: 'Large Local Reaction Adjustment',
                                         type: 'panel',
-                                        visibleIf: '{l2} contains "Large Local Reaction" and {l1} != "Disable"',
+                                        visibleIf: '{triggers} contains "Large Local Reaction"',
                                         elements:
                                             [
                                                 {
-                                                    name: 'l41',
+                                                    name: 'largeReactionWheelSize',
                                                     title: 'What is the minimum delayed or immediate measured wheal size that constitutes a Large Local Reaction? (mm)',
                                                     type: 'text',
                                                     inputType: 'numeric',
-                                                    enableIf: "{l1} = 'Customize'",
                                                     defaultValue: '11',
-                                                    visibleIf: "{l1} != 'Disable'"
                                                 },
                                                 {
-                                                    name: 'l4a',
+                                                    name: 'largeReactionAction',
                                                     title: 'Action to Take',
                                                     type: 'radiogroup',
                                                     colCount: '3',
-                                                    enableIf: "{l1} = 'Customize'",
-                                                    visibleIf: "{l1} != 'Disable'",
                                                     defaultValue: 'Decrease Injection Volume',
                                                     choices: ['Decrease Injection Volume', 'Dilute Vial', 'Reduce Bottle Number'],
                                                 },
                                                 {
-                                                    name:'l4a1',
+                                                    name:'largeReactionDecrease',
                                                     title: 'Decrease volume (ml)',
                                                     type: 'text',
                                                     inputType: 'numeric',
                                                     defaultValue: '0.05',
-                                                    enableIf: "{l1} = 'Customize'",
-                                                    visibleIf: '{l4a} == "Decrease Injection Volume"'
+                                                    visibleIf: '{largeReactionAction} == "Decrease Injection Volume"'
                                                 },
                                                 {
-                                                    name:'l4a2',
+                                                    name:'largeReactionDilute',
                                                     title: 'How many times should the vial be diluted?',
                                                     type: 'text',
                                                     inputType: 'numeric',
                                                     defaultValue: '1',
-                                                    enableIf: "{l1} = 'Customize'",
-                                                    visibleIf: '{l4a} == "Dilute Vial"'
+                                                    visibleIf: '{largeReactionAction} == "Dilute Vial"'
                                                 },
                                                 {
-                                                    name:'l4a3',
+                                                    name:'largeReactionReduce',
                                                     title: 'Reduce bottle number by:',
                                                     type: 'text',
                                                     inputType: 'numeric',
                                                     defaultValue: '1',
-                                                    enableIf: "{l1} = 'Customize'",
-                                                    visibleIf: '{l4a} == "Reduce Bottle Number"'
+                                                    visibleIf: '{largeReactionAction} == "Reduce Bottle Number"'
                                                 }
                                             ],
                                     },
-                                    
                                     {
-                                        name: 'l5',
+                                        name: 'testReactionAdjustment',
                                         title: 'Vial Test Reaction Adjustment',
                                         type: 'panel',
-                                        visibleIf: '{l2} contains "Vial Test Reaction"',
+                                        visibleIf: '{triggers} contains "Vial Test Reaction"',
                                         elements:
                                             [
                                                 {
-                                                name: 'l51',
-                                                title: 'What is the minimum wheal size that would trigger a dose adjustment from a Vial Test? (mm)',
-                                                type: 'text',
-                                                inputType: 'numeric',
-                                                enableIf: "{l1} = 'Customize'",
-                                                defaultValue: '11',
-                                                visibleIf: "{l1} != 'Disable'"
+                                                    name: 'testReactionWheelSize',
+                                                    title: 'What is the minimum wheal size that would trigger a dose adjustment from a Vial Test? (mm)',
+                                                    type: 'text',
+                                                    inputType: 'numeric',
+                                                    defaultValue: '11',
                                                 },
                                                 {
-                                                    name: 'l5a',
+                                                    name: 'testReactionAction',
                                                     title: 'Action to Take',
                                                     type: 'radiogroup',
                                                     colCount: '3',
-                                                    enableIf: "{l1} = 'Customize'",
-                                                    visibleIf: "{l1} != 'Disable'",
                                                     defaultValue: 'Decrease Injection Volume',
                                                     choices: ['Decrease Injection Volume', 'Dilute Vial', 'Reduce Bottle Number'],
                                                 },
                                                 {
-                                                    name:'l5a1',
+                                                    name:'testReactionDecrease',
                                                     title: 'Decrease volume (ml)',
                                                     type: 'text',
                                                     inputType: 'numeric',
                                                     defaultValue: '0.05',
-                                                    enableIf: "{l1} = 'Customize'",
-                                                    visibleIf: '{l5a} == "Decrease Injection Volume"'
+                                                    visibleIf: '{testReactionAction} == "Decrease Injection Volume"'
                                                 },
                                                 {
-                                                    name:'l5a2',
+                                                    name:'testReactionDilute',
                                                     title: 'How many times should the vial be diluted?',
                                                     type: 'text',
                                                     inputType: 'numeric',
                                                     defaultValue: '1',
-                                                    enableIf: "{l1} = 'Customize'",
-                                                    visibleIf: '{l5a} == "Dilute Vial"'
+                                                    visibleIf: '{testReactionAction} == "Dilute Vial"'
                                                 },
                                                 {
-                                                    name:'l5a3',
+                                                    name:'testReactionReduce',
                                                     title: 'Reduce bottle number by:',
                                                     type: 'text',
                                                     inputType: 'numeric',
                                                     defaultValue: '1',
-                                                    enableIf: "{l1} = 'Customize'",
-                                                    visibleIf: '{l5a} == "Reduce Bottle Number"'
+                                                    visibleIf: '{testReactionAction} == "Reduce Bottle Number"'
                                                 }
                                             ],
                                     }

@@ -7,6 +7,9 @@ const practiceController = require('../controllers/practice_controller');
 // Add a practice
 router.post('/addPractice', practiceController.addPractice);
 
+// Update practice by ID
+router.put('/updatePractice/:id', practiceController.updatePractice);
+
 // Get a practice by ID
 router.get('/practice/:id', practiceController.getPractice);
 
