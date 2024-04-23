@@ -9,6 +9,7 @@ export default function Portal({navigation}){
 
    const { signOut } = useContext(AuthContext);
    const userInfo = User();
+   console.log(userInfo);
    const role = userInfo.role;
    const firstName = userInfo.firstName;
 
@@ -24,71 +25,7 @@ export default function Portal({navigation}){
    }, []);
 
 
-   return role == 2 ? (
-      // PATIENT PORTAL
-      <View style = {styles.container}>
-      <Text style={styles.header}>Welcome, {firstName}</Text>
-      <View style={{flex: 1, flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', paddingTop: 22}}>
-      <TouchableOpacity style={styles.menuItem}
-         onPress={() =>
-            navigation.navigate('PatientHome')
-         }>
-            <Text style={styles.menuItemText}>Appointments</Text>
-            <IconButton
-               icon="calendar-month"
-               iconColor="#1059d5"
-               size={30}
-               alignItems='center'
-            />
-         </TouchableOpacity> 
-         <TouchableOpacity style={styles.menuItem}
-         onPress={() =>
-            navigation.navigate('Alerts')
-         }>
-            <Text style={styles.menuItemText}>Alerts</Text>
-            <IconButton
-               icon="alert"
-               iconColor="#1059d5"
-               size={30}
-               alignItems='center'
-            />
-         </TouchableOpacity>
-         <TouchableOpacity style={styles.menuItem}>
-            <Text style={styles.menuItemText}>Report a Reaction</Text>
-            <IconButton
-               icon="exclamation-thick"
-               iconColor="#1059d5"
-               size={30}
-               alignItems='center'
-            />
-         </TouchableOpacity> 
-         <TouchableOpacity style={styles.menuItem}onPress={() =>
-            navigation.navigate('PracticeSurvey')
-         }>
-            <Text style={styles.menuItemText}>Edit Survey Responses</Text>
-            <IconButton
-               icon="pencil"
-               iconColor="#1059d5"
-               size={30}
-               alignItems='center'
-            />
-         </TouchableOpacity>
-         <TouchableOpacity style={styles.menuItem}
-         onPress={() =>
-            signOut()
-         }>
-            <Text style={styles.menuItemText}>Sign Out</Text>
-            <IconButton
-               icon="exit-to-app"
-               iconColor="#1059d5"
-               size={30}
-               alignItems='center'
-            />
-         </TouchableOpacity> 
-      </View>
-      </View>
-   ) : (
-      // PROVIDER PORTAL
+   return (
       <View style = {styles.container2}>
          <View style={{flexDirection: 'row'}}>
             <Text style={styles.header2}>Welcome, {firstName}!</Text>

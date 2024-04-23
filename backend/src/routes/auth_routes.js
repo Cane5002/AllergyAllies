@@ -2,8 +2,11 @@ const express = require('express')
 const router = express.Router()
 const authController = require('../controllers/auth_controller')
 
-router.route('/')
-    .post(authController.login)
+router.route('/provider')
+    .post(authController.providerLogin)
+
+router.route('/patient')
+    .post(authController.patientLogin)
 
 router.route('/refresh')
     .get(authController.refresh)
