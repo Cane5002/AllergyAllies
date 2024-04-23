@@ -70,17 +70,17 @@ export default function PracticeSurvey() {
         //Missed Dose Adjustment
         missedAdjustment: protocol.missedDoseAdjustment,
         //Large Reaction Dose Adjustment
-        largeReactionWheelSize: protocol.largeReactionsDoseAdjustment.whealLevelForAdjustment,
-        largeReactionAction: protocol.largeReactionsDoseAdjustment.action,
-        largeReactionDecrease: protocol.largeReactionsDoseAdjustment.decreaseInjectionVol,
-        largeReactionDilute: protocol.largeReactionsDoseAdjustment.adjustVialConcentration,
-        largeReactionReduce: protocol.largeReactionsDoseAdjustment.adjustBottleNumber,
+        largeReactionWheelSize: protocol.largeReactionDoseAdjustment.whealLevelForAdjustment,
+        largeReactionAction: protocol.largeReactionDoseAdjustment.action,
+        largeReactionDecrease: protocol.largeReactionDoseAdjustment.decreaseInjectionVol,
+        largeReactionDilute: protocol.largeReactionDoseAdjustment.decreaseVialConcentration,
+        largeReactionReduce: protocol.largeReactionDoseAdjustment.decreaseBottleNumber,
         //Test Reaction Adjustment
         testReactionWheelSize: protocol.vialTestReactionAdjustment.whealLevelForAdjustment,
         testReactionAction: protocol.vialTestReactionAdjustment.action,
         testReactionDecrease: protocol.vialTestReactionAdjustment.decreaseInjectionVol,
-        testReactionDilute: protocol.vialTestReactionAdjustment.adjustVialConcentration,
-        testReactionReduce: protocol.vialTestReactionAdjustment.adjustBottleNumber,
+        testReactionDilute: protocol.vialTestReactionAdjustment.decreaseVialConcentration,
+        testReactionReduce: protocol.vialTestReactionAdjustment.decreaseBottleNumber,
     })
 
     // Function to handle survey completion
@@ -109,19 +109,19 @@ export default function PracticeSurvey() {
                 injectionVolumeIncreaseInterval: json.advancementIncrement
             },
             triggers: json.triggers,
-            largeReactionsDoseAdjustment: {
+            largeReactionDoseAdjustment: {
                 whealLevelForAdjustment: json.largeReactionWheelSize,
                 action: json.largeReactionAction,
                 decreaseInjectionVol: json.largeReactionDecrease,
-                adjustVialConcentration: json.largeReactionDilute,
-                adjustBottleNumber: json.largeReactionReduce
+                decreaseVialConcentration: json.largeReactionDilute,
+                decreaseBottleNumber: json.largeReactionReduce
             },
             vialTestReactionAdjustment: {
                 whealLevelForAdjustment: json.testReactionWheelSize,
                 action: json.testReactionAction,
                 decreaseInjectionVol: json.testReactionDecrease,
-                adjustVialConcentration: json.testReactionDilute,
-                adjustBottleNumber: json.testReactionReduce
+                decreaseVialConcentration: json.testReactionDilute,
+                decreaseBottleNumber: json.testReactionReduce
             },
             missedDoseAdjustment: json.missedAdjustment,
         }

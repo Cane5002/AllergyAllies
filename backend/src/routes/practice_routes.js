@@ -13,15 +13,6 @@ router.put('/updatePractice/:id', practiceController.updatePractice);
 // Get a practice by ID
 router.get('/practice/:id', practiceController.getPractice);
 
-// Get a practice by code
-router.get('/practiceByCode/:code', practiceController.getPracticeByCode);
-
-// Get a practice by name
-router.get('/practiceByName/:name', practiceController.getPracticeByName);
-
-// Get a list of all practice
-router.get('/getAllPractices', practiceController.getAllPractices );
-
 // Delete a practice by ID
 router.delete('/deletePractice/:id', practiceController.deletePractice);
 

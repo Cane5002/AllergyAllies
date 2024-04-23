@@ -1,5 +1,6 @@
 const { resolveSoa } = require('dns');
 const practice = require('../Models/practice');
+const protocol = require('../Models/protocols');
 const multer = require('multer');
 const path = require('path');
 
@@ -19,12 +20,50 @@ exports.addPractice = async (req, res) => {
             if (npi.length != 10) return res.status(200).json({message: `Povider NPI ${npi} must be 10 digits`});
         }
 
-        const data = new practice({
+        let newPractice = new practice({
             practiceName, providerNPIs, phoneNumber, email, address, officeHours, allergyShotHours, practiceCode
         });
-        
-        const dataToSave = await data.save();
-        return res.status(201).json(dataToSave);
+        let savedPractice = await newPractice.save();
+
+        // "protocol validation failed: practiceID: Path `practiceID` is required."
+        let defaultProtocol = new protocol({
+            practiceID: savedPractice._id,
+            injectionFrequency: {
+                freq: 2,
+                interval: "Weekly"
+            },
+            bottles: [],
+            nextDoseAdjustment: {
+                startingInjectionVol: 0.05,
+                maxInjectionVol: 0.05,
+                injectionVolumeIncreaseInterval: 5,
+            },
+            triggers: ['Missed Injection Adjustment', 'Large Local Reaction', 'Vial Test Reaction'],
+            largeReactionDoseAdjustment: {
+                whealLevelForAdjustment: 11,
+                action: 'Decrease Injection Volume',
+                decreaseInjectionVol: 0.05,
+                decreaseVialConcentration: 1,
+                decreaseBottleNumber: 1,
+            },
+            vialTestReactionAdjustment: {
+                whealLevelForAdjustment: 11,
+                action: 'Decrease Injection Volume',
+                decreaseInjectionVol: 0.05,
+                decreaseVialConcentration: 1,
+                decreaseBottleNumber: 1,
+            },
+            missedDoseAdjustment: [{
+                daysMissed: 10,
+                action: 'Decrease Injection Volume',
+                decreaseInjectionVol: 0.05,
+                decreaseVialConcentration: 1,
+                decreaseBottleNumber: 1,
+            }],
+        })
+        let savedProtocol = await defaultProtocol.save();
+
+        return res.status(201).json(savedPractice);
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }

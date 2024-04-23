@@ -25,7 +25,7 @@ const missedDoseAdjustments = new mongoose.Schema ({
         required: true,
         type: String
     },
-    injectionVolumeDecrease: {
+    decreaseInjectionVol: {
         required: true,
         type: Number,
     },
@@ -40,7 +40,7 @@ const missedDoseAdjustments = new mongoose.Schema ({
 })
 
 // dose adjustments for skin reactions to medicine
-const largeReactionsDoseAdjustments = new mongoose.Schema({
+const largeReactionDoseAdjustments = new mongoose.Schema({
     whealLevelForAdjustment: {
         required: true,
         type: Number,
@@ -53,11 +53,11 @@ const largeReactionsDoseAdjustments = new mongoose.Schema({
         required: true,
         type: Number,
     },
-    adjustVialConcentration: {
+    decreaseVialConcentration: {
         required: true,
         type: Number,
     },
-    adjustBottleNumber: {
+    decreaseBottleNumber: {
         required: true,
         type: Number,
     }
@@ -76,11 +76,11 @@ const vialTestReactionAdjustments = new mongoose.Schema({
         required: true,
         type: Number,
     },
-    adjustVialConcentration: {
+    decreaseVialConcentration: {
         required: true,
         type: Number,
     },
-    adjustBottleNumber: {
+    decreaseBottleNumber: {
         required: true,
         type: Number,
     }
@@ -115,14 +115,13 @@ const dataSchema = new mongoose.Schema({
         required: true,
         type: String
     },
-    nextDoseAdjustment: nextDoseAdjustments,
-    largeReactionsDoseAdjustment: largeReactionsDoseAdjustments,
+    injectionFrequency: injectionFrequency,  
     bottles: [bottleSchema],
-    vialTestReactionAdjustment: vialTestReactionAdjustments,
+    nextDoseAdjustment: nextDoseAdjustments,
     triggers: Array,
+    largeReactionDoseAdjustment: largeReactionDoseAdjustments,
+    vialTestReactionAdjustment: vialTestReactionAdjustments,
     missedDoseAdjustment: [missedDoseAdjustments],
-    largeReactionsDoseAdjustment: largeReactionsDoseAdjustments,
-    injectionFrequency: injectionFrequency  
 }, { collection: 'Protocols' })
 
 module.exports = mongoose.model('protocol', dataSchema)

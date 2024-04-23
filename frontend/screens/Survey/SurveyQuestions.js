@@ -227,7 +227,7 @@ export default {
                                                 choices: ['Decrease Injection Volume', 'Dilute Vial', 'Reduce Bottle Number'],
                                             },
                                             {
-                                                name:'injectionVolumeDecrease',
+                                                name:'decreaseInjectionVol',
                                                 title: 'Decrease volume (ml)',
                                                 type: 'text',
                                                 inputType: 'numeric',

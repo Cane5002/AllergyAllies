@@ -7,20 +7,22 @@ const addProtocol = async (req, res) => {
             practiceID,
             nextDoseAdjustment,
             bottles,
-            vialTestReactionAdjustment,
+            injectionFrequency,
+            triggers,
             missedDoseAdjustment,
-            largeReactionsDoseAdjustment,
-            injectionFrequency
+            largeReactionDoseAdjustment,
+            vialTestReactionAdjustment,
         } = req.body
 
         const data = new protocol ({
             practiceID,
             nextDoseAdjustment,
             bottles,
-            vialTestReactionAdjustment,
+            injectionFrequency,
+            triggers,
             missedDoseAdjustment,
-            largeReactionsDoseAdjustment,
-            injectionFrequency
+            largeReactionDoseAdjustment,
+            vialTestReactionAdjustment,
         })
         const dataToSave = await data.save();
         res.status(200).json(dataToSave);
