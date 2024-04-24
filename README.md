@@ -3,6 +3,8 @@
 
 AllergyAlly includes a mobile application for patients undergoing subcutaneous immunotherapy for environmental allergy desensitization, as well as a practitioner web application for patient monitoring. The app has a variety of functionalities, including calculating the patient’s next dosage, tracking their appointment attendance, and alerting practitioners of patients who are at risk of attrition. This will be a highly useful tool in ensuring the effectiveness of patients’ therapy, as poor compliance with injection schedules can set treatment backwards. Additionally, it will help to reduce rates of attrition for patients. To build the frontend of the app, we used React Native with Expo. We also used a MongoDB database to maintain patient and practice accounts that include all relevant data, and an Express and Node backend to tie together all functionalities of the app.
 
+[Project Demo](https://youtu.be/n-p6PPq_3Hg)
+
 ---
 This project requires node. You can verify this with:
         node -v
