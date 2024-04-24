@@ -14,7 +14,7 @@ export default function PatientProfile({navigation}) {
   const userInfo = User();
   const firstName = userInfo.firstName;
   const lastName = userInfo.lastName;
-  const email = userInfo.email;
+  const id = userInfo.id;
 
   const [patient, setPatient] = useState();
   const [protocol, setProtocol] = useState();
@@ -24,15 +24,12 @@ export default function PatientProfile({navigation}) {
 
   // Get the current bottles for this patient's practice
   useEffect(() => {
-
     const findPatient = async () => {
-      if (email){
-        //replace with your IP address, find quickly from "Metro waiting on exp://<ip>:port" under QR code
-        const patientObj = await axios.get(`${process.env.EXPO_PUBLIC_BACKEND_URL}:${process.env.EXPO_PUBLIC_BACKEND_PORT}/api/findPatient/${email}`)
-        setPatient(patientObj.data)
-      }
+      //replace with your IP address, find quickly from "Metro waiting on exp://<ip>:port" under QR code
+      const patientObj = await axios.get(`${process.env.EXPO_PUBLIC_BACKEND_URL}:${process.env.EXPO_PUBLIC_BACKEND_PORT}/api/getPatient/${id}`)
+      setPatient(patientObj.data)
     }
-    if (!patient) { console.log("can't find patient"); findPatient(); }
+    if (!patient) { console.log("Retrieving Patient"); findPatient()}
 
     const findPractice = async () => {
       //replace with your IP address, find quickly from "Metro waiting on exp://<ip>:port" under QR code

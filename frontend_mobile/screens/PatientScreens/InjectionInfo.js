@@ -20,12 +20,14 @@ export default function InjectionInfo({route, navigation}){
         
               //get data for each bottle
               data = bottles.map((bottle, index) => {
+                console.log(bottle);
   
                 return {
                   id: index + 1,
                   title: `Vial ${index + 1}: ${bottle.nameOfBottle}`,
                   bottleNum: bottle.currBottleNumber,
-                  dosage: bottle.injVol
+                  dosage: bottle.injVol,
+                  location: bottle.locationOfInjection
                 };
               });
 
@@ -86,7 +88,7 @@ export default function InjectionInfo({route, navigation}){
             </View>
             <View>
               <Text style={styles.cardSubData}>Location</Text>    
-              <Text style={styles.cardData}>Upper Left Arm</Text>    
+              <Text style={styles.cardData}>{item.location}</Text>    
             </View> 
           </View> 
         </View>
@@ -295,7 +297,7 @@ const styles = StyleSheet.create({
     viewAllAppointments: {
       margin: 18,
       color: '#1059d5',
-      alignSelf: 'center',
+      alignItems: 'center',
       fontSize: 17,
       fontWeight: '500',
       textDecorationLine: 'underline',

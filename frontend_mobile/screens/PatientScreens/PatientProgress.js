@@ -16,7 +16,7 @@ const Tab = createBottomTabNavigator();
 export default function PatientProgress({navigation}){
 
     const userInfo = User();
-    const email = userInfo.email;
+    const id = userInfo.id;
 
     const [patient, setPatient] = useState();
     const [treatments, setTreatments] = useState();
@@ -56,19 +56,16 @@ export default function PatientProgress({navigation}){
 
   //get the list of treatments associated with patient
   useEffect(() => {
-
     const findPatient = async () => {
-      if (email){
-        //replace with your IP address, find quickly from "Metro waiting on exp://<ip>:port" under QR code
-        const patientObj = await axios.get(`${process.env.EXPO_PUBLIC_BACKEND_URL}:${process.env.EXPO_PUBLIC_BACKEND_PORT}/api/findPatient/${email}`)
-        setPatient(patientObj.data)
-      }
+      //replace with your IP address, find quickly from "Metro waiting on exp://<ip>:port" under QR code
+      const patientObj = await axios.get(`${process.env.EXPO_PUBLIC_BACKEND_URL}:${process.env.EXPO_PUBLIC_BACKEND_PORT}/api/getPatient/${id}`)
+      setPatient(patientObj.data)
     }
-    if (!patient) { findPatient(); console.log("can't find patient")}
+    if (!patient) { console.log("Retrieving Patient"); findPatient()}
 
     const findTreatments = async () => {
       //replace with your IP address, find quickly from "Metro waiting on exp://<ip>:port" under QR code
-      const treatmentsObj = await axios.get(`${process.env.EXPO_PUBLIC_BACKEND_URL}:${process.env.EXPO_PUBLIC_BACKEND_PORT}/api/getAllTreatmentsByID/${patient._id}`)
+      const treatmentsObj = await axios.get(`${process.env.EXPO_PUBLIC_BACKEND_URL}:${process.env.EXPO_PUBLIC_BACKEND_PORT}/api/getAllTreatmentsByID/${id}`)
       //sort treatments by date
       const sortedTreatments = treatmentsObj.data.slice().sort((a, b) => {
         const dateA = new Date(a.date);
@@ -78,6 +75,13 @@ export default function PatientProgress({navigation}){
       
       // only return appointments attended / not future appointment deadline
       const attendedTreatments = sortedTreatments.filter(treatment => treatment.attended === true);
+      
+      // Set Progress
+      let percentMaintenance = await axios.get(`${process.env.EXPO_PUBLIC_BACKEND_URL}:${process.env.EXPO_PUBLIC_BACKEND_PORT}/api/findPercentMaintenance/${id}`);
+      for (let i = 0; i < percentMaintenance.data.array.length; i++) {
+        attendedTreatments[0].bottles[i].percent = percentMaintenance.data.array[i];
+      }
+
       setTreatments(attendedTreatments)
     }
     if (!treatments && patient) { findTreatments(); }
@@ -111,7 +115,7 @@ export default function PatientProgress({navigation}){
                 return {
                   id: index + 1,
                   title: `Vial ${index + 1}: ${bottle.nameOfBottle}`,
-                  progress: 50, // hardcoded, replace later
+                  progress: bottle.percent, // hardcoded, replace later
                   lastInjDate: formatDate(treatments[0].date),
                   maintenanceNum: maintenanceObj ? maintenanceObj.maintenanceNumber : 'N/A',
                   bottleNum: bottle.currBottleNumber,
