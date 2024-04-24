@@ -281,7 +281,6 @@ export default function PatientDetails({ route, navigation }) {
       if (lastTreatment.daysSinceLast >= thresholdDays) style = styles.warning 
     }
     
-    console.log("returns");
     return (
       <View style={{ flex: 1, flexDirection: 'row', paddingTop: 7 }}>
         <Text style={styles.prompt3}>Days since last treatment: </Text>

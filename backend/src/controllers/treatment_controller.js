@@ -72,7 +72,7 @@ exports.addTreatment = async (req, res) => {
     try {
 
         //This method is called when a patient creates an account creating an empty treatment that needs to be updated
-        const { patientID, date, practiceID} = req.body;
+        const { patientID, practiceID, date, bottles} = req.body;
 
         const patientToFind = await patient.findById(patientID);
         if (patientToFind == null) {
@@ -107,61 +107,21 @@ exports.addTreatment = async (req, res) => {
             patientFirstName: patientToFind.firstName, 
             patientID: patientID,
             date: date, 
-            attended: false,
+            bottles: bottles,
+            attended: true,
         });
         await data.save();
 
         //Add patient treatment data to end of array
         patientToFind.treatments.push(data.id);
-        let maintenanceNumber = 1;
 
-        let tempArray = [];
+        await patient.findOneAndUpdate({patientID}, patientToFind);
 
-        for(let i = 0; i < findProtocol.bottles.length; i++){
-            tempArray.push( {nameOfBottle: JSON.stringify(findProtocol.bottles[i].bottleName), maintenanceNumber} );
-        }
-        patientToFind.maintenanceBottleNumber = tempArray;
-
-        await patientToFind.save();
-
-        let treatmentLength = patientToFind.treatments.length;
-        let newVialValues = {dilution: 0, bottleNumber: "0", whealSize: 0};
-
-        let startingInjVol = JSON.stringify(findProtocol.nextDoseAdjustment.startingInjectionVol);
-        let newMap = new Map();
-
-        //Adds bottles to treatment with starting inj value and 0 for all other fields
-        if(treatmentLength == 1){
-            for(let i = 0; i < findProtocol.bottles.length; i++){
-                let newDate = new Date(date);
-                data.bottles.push({
-                    nameOfBottle: findProtocol.bottles[i].bottleName,
-                    injVol: parseFloat(startingInjVol),
-                    injDilution: 0,
-                    injLLR: 0,
-                    currBottleNumber: "1",
-                    currentDoseAdvancement: 0,
-                    adverseReaction: false,
-                    needsVialTest: false,
-                    locationOfInjection: "",
-                    expirationDate: formatDate(new Date(newDate.setMonth(newDate.getMonth()+ findProtocol.bottles[i].shelfLife))),
-                    needsRefill: false
-                });
-                newMap.set(findProtocol.bottles[i].bottleName, {name: findProtocol.bottles[i].bottleName, values: newVialValues});
-            }
-            data.lastVialTests = newMap;
-            const dataToSave = await data.save();
-            return res.status(200).json(dataToSave); 
-        }
-        else{
-
-            return res.status(201).json({message: 'Patient\'s last treatment needs to be updated'});
-            
-        }
-        
+        return res.status(201).json(data);
     }
     catch (error) {
-        res.status(400).json({ message: error.message });
+        console.log(error.message);
+        return res.status(500).json({ message: error.message });
     }
 }
 
