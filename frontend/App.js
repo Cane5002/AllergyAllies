@@ -10,99 +10,24 @@ import Maintenance from './screens/Injection/MaintenanceBottleNum.js';
 import PracticeSurvey from './screens/Survey/PracticeSurvey.js';
 import ProviderSignInScreen from './screens/ProviderScreens/ProviderSignInScreen.js';
 import LoadingScreen from './screens/LoadingScreen.js';
-import PatientSignUpScreen from './screens/signup/PatientSignUpScreen';
 import ProviderSignUpScreen from './screens/signup/ProviderSignUpScreen.js';
 import PracticeEnrollment from './screens/signup/practiceEnrollment.js';
-import PatientHome from './screens/PatientScreens/PatientHome.js';
-import Upcoming from './screens/PatientScreens/Upcoming.js';
 import InitialScreen from './screens/InitialScreen.js';
 import AuthContext from './AuthContext';
 import ViewPatients from './screens/ProviderScreens/ViewPatients.js';
 
-import ViewAllAppointments from './screens/PatientScreens/ViewAllAppointments.js';
 import PatientDetails from './screens/ProviderScreens/PatientDetails.js';
 import PatientInfoScreen from './screens/ProviderScreens/PatientInfoScreen.js';
-import FirstScreen from './screens/ProviderScreens/FirstScreen.js';
-import SecondScreen from './screens/ProviderScreens/SecondScreen.js';
-import SubmitScreen from './screens/ProviderScreens/SubmitScreen.js';
+import FirstScreen from './screens/Survey/SNOTSurvey/SNOTFirstScreen.js';
+import SecondScreen from './screens/Survey/SNOTSurvey/SNOTSecondScreen.js';
+import SubmitScreen from './screens/Survey/SNOTSurvey/SNOTSubmitScreen.js';
 
 
 import { useMemo, useReducer, useEffect } from 'react';
 //import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import AsyncStorage from "@react-native-async-storage/async-storage";
-// import * as SecureStore from 'expo-secure-store';
-
-import InitialMobileScreen from './screens/PatientScreens/InitialMobileScreen.js'
-import InjectionInfo from './screens/PatientScreens/InjectionInfo.js';
-import EditCurrentMedications from './screens/PatientScreens/EditCurrentMedications.js';
-import PatientSignInScreen from './screens/PatientScreens/PatientSignInScreen.js';
-//import AppointmentInfo from './screens/AppointmentInfo';
-
-// Secure store doesn't work on web, only iOS and android ^
 
 const Stack = createNativeStackNavigator();
-
-
-
-const InitialMobileStack = (
-  <>
-  <Stack.Screen
-      name="InitialMobileScreen"
-      component={InitialMobileScreen}
-      options={{
-        title: 'InitialMobileScreen',
-        headerTitleAlign: 'center',
-        headerShown: false,
-        headerBackTitleVisible: false,
-        headerTitleStyle: { textAlign: 'center' },
-        //animationTypeForReplace: state.isSignout ? 'pop' : 'push',
-      }}
-    />
-    <Stack.Screen
-      name="PatientSignIn"
-      component={PatientSignInScreen}
-      options={{
-        title: 'Patient Login',
-        headerTitleAlign: 'center',
-        headerTitleStyle: { textAlign: 'center' },
-        headerBackTitleVisible: false,
-        //animationTypeForReplace: state.isSignout ? 'pop' : 'push',
-      }}
-    />
-    <Stack.Screen
-              name="PatientSignUpScreen"
-              component={PatientSignUpScreen}
-              options={{
-                title: 'Patient Sign Up',
-                headerBackTitleVisible: false,
-                headerTitleAlign: 'center',
-                headerTitleStyle: {textAlign: 'center'},
-                //animationTypeForReplace: state.isSignout ? 'pop' : 'push',
-              }}
-            />
-    <Stack.Screen
-              name="ProviderSignUpScreen"
-              component={ProviderSignUpScreen}
-              options={{
-                title: 'Provider Sign Up',
-                headerTitleAlign: 'center',
-                headerTitleStyle: {textAlign: 'center'},
-               // animationTypeForReplace: state.isSignout ? 'pop' : 'push',
-              }}
-            />
-    <Stack.Screen
-              name="PracticeEnrollment"
-              component={PracticeEnrollment}
-              options={{
-                title: 'Practice Enrollment',
-                headerTitleAlign: 'center',
-                headerTitleStyle: {textAlign: 'center'},
-               // animationTypeForReplace: state.isSignout ? 'pop' : 'push',
-              }}
-            />
-    {/* Add other mobile-specific screens here */}
-  </>
-);
 
 const InitialDesktopStack = (
   <>
@@ -127,61 +52,34 @@ const InitialDesktopStack = (
       }}
     />
     <Stack.Screen
-              name="PatientSignUpScreen"
-              component={PatientSignUpScreen}
-              options={{
-                title: 'Patient Signup',
-                headerTitleAlign: 'center',
-                headerTitleStyle: {textAlign: 'center'},
-               //animationTypeForReplace: state.isSignout ? 'pop' : 'push',
-              }}
-            />
-            <Stack.Screen
-              name="ProviderSignUpScreen"
-              component={ProviderSignUpScreen}
-              options={{
-                title: 'Provider Sign Up',
-                headerTitleAlign: 'center',
-                headerTitleStyle: {textAlign: 'center'},
-                //animationTypeForReplace: state.isSignout ? 'pop' : 'push',
-              }}
-            />
-            <Stack.Screen
-              name="PracticeEnrollment"
-              component={PracticeEnrollment}
-              options={{
-                title: 'Practice Enrollment',
-                headerTitleAlign: 'center',
-                headerTitleStyle: {textAlign: 'center'},
-                //animationTypeForReplace: state.isSignout ? 'pop' : 'push',
-              }}
-            />
+      name="ProviderSignUpScreen"
+      component={ProviderSignUpScreen}
+      options={{
+        title: 'Provider Sign Up',
+        headerTitleAlign: 'center',
+        headerTitleStyle: {textAlign: 'center'},
+        //animationTypeForReplace: state.isSignout ? 'pop' : 'push',
+      }}
+    />
+    <Stack.Screen
+      name="PracticeEnrollment"
+      component={PracticeEnrollment}
+      options={{
+        title: 'Practice Enrollment',
+        headerTitleAlign: 'center',
+        headerTitleStyle: {textAlign: 'center'},
+        //animationTypeForReplace: state.isSignout ? 'pop' : 'push',
+      }}
+    />
     {/* Add other desktop-specific screens here */}
   </>
 );
-
-
-const SignedInMobileStack = (
-  <>
-      <Stack.Screen name="PatientHome" component={PatientHome} options={{title: 'AllergyAlly'}} />
-      <Stack.Screen name="Upcoming" component={Upcoming} options={{title: 'Upcoming Appointment', headerBackTitleVisible: false}} />
-      <Stack.Screen name="PatientSignUpScreen" component={PatientSignUpScreen} options={{title: 'Patient Sign Up'}} />
-      <Stack.Screen name= "ViewAllAppointments" component={ViewAllAppointments} options={{title: 'AllergyAlly', headerBackTitleVisible: false}} />
-      <Stack.Screen name="InjectionInfo" component={InjectionInfo} options={{title: 'AllergyAlly', headerBackTitleVisible: false}} />
-      <Stack.Screen name="EditCurrentMedications" component={EditCurrentMedications} options={{title: 'AllergyAlly', headerBackTitleVisible: false}} />
-     
-  </>
-);
-
 
 const SignedInDesktopStack = (
   <>
       <Stack.Screen name="Portal" component={Portal} />
       <Stack.Screen name="AllAlerts" component={AllAlerts} options={{title: 'All Alerts'}}/>
       <Stack.Screen name="Reports" component={Reports} />
-      <Stack.Screen name="PatientHome" component={PatientHome} options={{title: 'Allergy Ally'}} />
-      <Stack.Screen name="Upcoming" component={Upcoming} options={{title: 'Upcoming Appointment'}} />
-      <Stack.Screen name="PatientSignUpScreen" component={PatientSignUpScreen} options={{title: 'Patient Sign Up'}} />
       <Stack.Screen name="ProviderSignUpScreen" component={ProviderSignUpScreen} options={{title: 'Provider Sign Up'}} />
       <Stack.Screen name="PracticeEnrollmentScreen" component={PracticeEnrollment} options={{ title: 'Practice Enrollment Screen'}} />
       <Stack.Screen name="PracticeSurvey" component={PracticeSurvey} />
@@ -189,8 +87,6 @@ const SignedInDesktopStack = (
       <Stack.Screen name="Injections" component={Injections} options={{title: 'Injections'}} />
       <Stack.Screen name="Maintenance" component={Maintenance} options={{title: 'Maintenance'}} />
       <Stack.Screen name="PatientDetails" component={PatientDetails} options={{title: 'Patient Details'}} />
-      <Stack.Screen name= "ViewAllAppointments" component={ViewAllAppointments} options={{title: 'ViewAllAppointments', headerBackTitleVisible: false}} />
-      <Stack.Screen name="InjectionInfo" component={InjectionInfo} options={{title: 'InjectionInfo', headerBackTitleVisible: false}} />
       <Stack.Screen name="PatientInfoScreen" component={PatientInfoScreen} options={{ title: 'Patient Information' }} />
       <Stack.Screen name="FirstScreen" component={FirstScreen} options={{ title: 'Snot Survey' }} />
       <Stack.Screen name="SecondScreen" component={SecondScreen} options={{ title: 'Snot Survey' }} />
@@ -289,10 +185,10 @@ export default function App({navigation}) {
             <Stack.Screen name="Loading" component={LoadingScreen} />
           ) : state.userToken == null ? (
             // No token found, user isn't signed in
-            isDesktop ? InitialDesktopStack : InitialMobileStack
+            InitialDesktopStack
           ) : (
             // User is signed in
-            isDesktop ? SignedInDesktopStack : SignedInMobileStack
+            SignedInDesktopStack
           )}
         </Stack.Navigator>
       </NavigationContainer>

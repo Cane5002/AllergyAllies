@@ -8,9 +8,6 @@ router.post('/addPatient', patientController.addPatient);
 // POST localhost:5000/api/addPatient
 router.post('/addPatientToProvider', patientController.addPatientToProvider);
 
-// GET localhost:5000/api/getAllPatients
-router.get('/getAllPatients', patientController.getAllPatients);
-
 // Get patients from a practice
 router.get('/getPatientsByPractice/:practiceID', patientController.getPatientsByPractice);
 
@@ -35,14 +32,14 @@ router.get('/resetTokens', patientController.resetTokens);
 // Get localhost:5000/api/findPercentMaintenance/:patientID
 router.get('/findPercentMaintenance/:patientID', patientController.findPercentMaintenance);
 
-// POST localhost:5000/api/addAllergyMedication
-router.post('/addAllergyMedication', patientController.addAllergyMedication);
+// PUT localhost:5000/api/addAllergyMedication
+router.post('/updateAllergyMedication/:patientID', patientController.updateAllergyMedication);
 
-// PATCH localhost:5000/api/:email/updateMaintenanceBottleNums
-router.patch('/:email/updateMaintenanceBottleNums', patientController.updateMaintenanceBottleNums);
+// PUT localhost:5000/api/:email/updateMaintenanceBottleNums
+router.put('/updateMaintenanceBottleNums/:patientID', patientController.updateMaintenanceBottleNums);
 
 // GET localhost:5000/api/getAllergyMedication
-router.get('/getAllergyMedication', patientController.getAllergyMedication);
+router.get('/getAllergyMedication/:patientID', patientController.getAllergyMedication);
 
 module.exports = router;
 

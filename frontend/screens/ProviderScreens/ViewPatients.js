@@ -38,7 +38,7 @@ export default function ViewPatients({ navigation }) {
     const PList = () => (
         <div>
             {renderData.map((p, index) =>
-                <DataTable.Row style={index == renderData.length - 1 ? { ...stylesList[index % 2], borderBottomEndRadius: 8, borderBottomStartRadius: 8 } : stylesList[index % 2]}>
+                <DataTable.Row style={index == renderData.length - 1 ? { ...stylesList[index % 2], borderBottomEndRadius: 8, borderBottomStartRadius: 8 } : stylesList[index % 2]} key={index}>
                     <DataTable.Cell>{p.firstName}</DataTable.Cell>
                     <DataTable.Cell>{p.lastName}</DataTable.Cell>
                     <DataTable.Cell>{p.DoB}</DataTable.Cell>

@@ -166,7 +166,7 @@ export default function PatientDetails({ route, navigation }) {
   const Vials = () => (
     <div>
       {protocol.bottles.map((bottle, index) =>
-        <View style={styles.section}>
+        <View style={styles.section} key={index}>
           {/* VIAL NAME */}
           <Text style={styles.prompt2}>{bottle.bottleName}</Text>
 

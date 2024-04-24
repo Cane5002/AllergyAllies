@@ -71,17 +71,6 @@ const getAllPatientsHelper = async (practiceID) => {
     }
 }
 
-// Get all method
-const getAllPatients = async (req, res) => {
-    try {
-        const patientsList = await getAllPatientsHelper();
-        return res.json(patientsList);
-    }
-    catch (error) {
-        return res.status(500).json({ message: error.message });
-    }
-}
-
 // Get all patients from a practice
 const getPatientsByPractice = async (req, res) => {
     try {
@@ -230,7 +219,7 @@ const resetTokens = async (req, res) => {
 
         return res.status(200).json({ message: 'All patient tokens reset to zero.'})
     } catch (error) {
-        return res.status(400).json({ message: error.message})
+        return res.status(500).json({ message: error.message})
     }
 }
 
@@ -239,6 +228,56 @@ const resetTokens = async (req, res) => {
 /*
     This method returns an array of numbers corresponding to the vials from the protocol and in patient bottles
 */
+const findPercentMaintenance = async (req, res) => {    
+    try {
+        const patientID = req.params.patientID
+        const foundPatient = await patient.findById(patientID);
+        if (!foundPatient) {
+            return res.status(404).json({ message: `Patient not found ${patientID}`});
+        }
+
+        const foundProtocol = await protocols.findOne( {practiceID: foundPatient.practiceID} );
+        if (!foundProtocol) {
+            return res.status(404).json({ message: `Protocol not found.`});
+        }
+
+        const lastTreatment = await treatment.findOne({patientID}).sort({_id: -1}).limit(1)
+        if (!lastTreatment) {
+            return res.status(200).json({ array: [0, 0, 0], message: 'Patient has no recorded treatments'});
+        }
+
+        let array = [];
+        for(let i = 0; i < foundProtocol.bottles.length; i++){
+            let bottleName = foundProtocol.bottles[i].bottleName;
+            let curBottle = lastTreatment.bottles.find((b) => {
+                return bottleName === b.nameOfBottle.replace(/^"(.*)"$/, '$1');
+            });
+            let mBottle = foundPatient.maintenanceBottleNumber.find((b) => {
+                return bottleName === b.nameOfBottle.replace(/^"(.*)"$/, '$1');
+            });
+            if (!curBottle | !mBottle ) {
+                array.push(0);
+                continue;
+            }
+            // Total Calc
+            let totalBottleSteps = mBottle.maintenanceNumber - 1;
+            let totalVolumeSteps = Math.ceil(( foundProtocol.nextDoseAdjustment.maxInjectionVol - foundProtocol.nextDoseAdjustment.startingInjectionVol ) / foundProtocol.nextDoseAdjustment.injectionVolumeIncreaseInterval) + 1;
+            let totalSteps = totalBottleSteps * totalVolumeSteps;
+            // Current Calc
+            let curBottleSteps = (curBottle.currBottleNumber == 'M' ? mBottle.maintenanceNumber : curBottle.currBottleNumber) - 1;
+            console.log(curBottle.curBottleNumber);
+            let curVolumeSteps = Math.ceil(( curBottle.injVol - foundProtocol.nextDoseAdjustment.startingInjectionVol ) / foundProtocol.nextDoseAdjustment.injectionVolumeIncreaseInterval ) + 1;
+            let curSteps = Math.max(curBottleSteps-1, 0) * totalVolumeSteps + curVolumeSteps;
+            array.push(Math.round(curSteps / totalSteps * 100)/100); //2 Decimal places
+        }
+
+        return res.status(200).json({array, message: `Array of maintenance sent`});
+    } catch(error){
+        console.log(error);
+        return res.status(500).json({ message: `Error`});
+    }
+}
+/*
 const findPercentMaintenance = async (req, res) => {
     try{
 
@@ -262,9 +301,7 @@ const findPercentMaintenance = async (req, res) => {
         let patientSecondToLastTreatmentID = null;
 
 
-        /*
-            Needs to catch out of bounds errors
-        */
+        // Needs to catch out of bounds errors
         try {
             patientNextTreatmentID = foundPatient.treatments[treatmentLength - 1];
             patientLastTreatmentID = foundPatient.treatments[treatmentLength - 2];
@@ -357,6 +394,7 @@ const findPercentMaintenance = async (req, res) => {
         return res.status(400).json({ message: `Error`});
     }
 }
+*/
 
 /*
     Body of medications sent as json like this:
@@ -372,12 +410,13 @@ const findPercentMaintenance = async (req, res) => {
 */
 
 
-const addAllergyMedication = async (req, res) => {
+const updateAllergyMedication = async (req, res) => {
     try{
-        const { patientID, medications  } = req.body;
-        const findPatient = await patient.findOne({ patientID: patientID });
-        findPatient.allergyMedication = medications;
-        await findPatient.save();
+        const query = { _id: req.params.patientID };
+        const update = { medications: req.body.medications };
+        const newPatient = await patient.findOneAndUpdate(query, update, {new: true});
+
+        return res.status(200).json({patient: newPatient});
     }
     catch(error){
         return res.status(400).json({ message: error.message})
@@ -419,14 +458,9 @@ const updateLLR = async (req, res) => {
 
 const updateMaintenanceBottleNums = async (req, res) => {
     try{
-        const email = req.params.email;
-        const query = {email : email}
-        const update = {maintenanceBottleNumber: req.body}
-
-        let p = await patient.findOne(query);
-        console.log(email);
-        console.log(p);
-        let updated = await patient.updateOne(query, update)
+        const query = { _id: req.params.patientID };
+        const update = { maintenanceBottleNumber: req.body };
+        let updated = await patient.findOneAndUpdate(query, update, {new: true});
         
         return res.status(200).json({patient: updated})
     }
@@ -440,14 +474,13 @@ module.exports = {
     addPatient,
     addPatientToProvider,
     getAllPatientsHelper,
-    getAllPatients,
     getPatientsByPractice,
     getPatient,
     checkEmail,
     addTokens,
     resetTokens,
     deletePatient,
-    addAllergyMedication,
+    updateAllergyMedication,
     findPercentMaintenance,
     getAllergyMedication,
     updateMaintenanceBottleNums,

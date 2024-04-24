@@ -3,7 +3,63 @@ const provider = require('../Models/provider')
 const jwt = require('jsonwebtoken')
 // const asyncHandler = require('express-async-handler')
 
-exports.login = async(req, res) => {
+exports.providerLogin = async(req, res) => {
+    const email = req.body.email.toString();
+    const password = req.body.password.toString();
+
+    // input verification
+    if (!email || !password) {
+        console.log("Email or password not correct")
+        return res.status(400).json({ message: 'All fields required' });
+    }
+
+    // find user in database - update for providers
+    const foundProvider = await provider.findOne({ email }).exec();
+
+    if (!foundProvider) { 
+        console.log("Provider not found.")
+        return res.status(401).json({ message: 'Invalid email or password' });
+    }
+    console.log("Provider account found")
+    let role = 1;
+
+    const match = password == foundProvider.password ? true : false;
+
+    if (!match) {
+        console.log("Password doesn't match")
+        return res.status(401).json({ message: 'Invalid email or password' });
+    }
+    let accessToken = jwt.sign(
+        {
+            "UserInfo": {
+                "id": foundProvider.id,
+                "role": role,
+                "firstName": foundProvider.firstName,
+                "lastName": foundProvider.lastName,
+                "practiceID": foundProvider.practiceID
+            }
+        },
+        process.env.ACCESS_TOKEN_SECRET,
+        { expiresIn: '5m'}
+    )
+
+    const refreshToken = jwt.sign(
+        { "id": foundProvider.id },
+        process.env.REFRESH_TOKEN_SECRET,
+        { expiresIn: '30m'}
+    )
+
+    res.cookie('jwt', refreshToken, {
+        httpOnly: false,
+        secure: true,
+        sameSite: 'None',
+        maxAge: 7*24*60*60*1000
+    })
+
+    res.json({ accessToken })
+}
+
+exports.patientLogin = async(req, res) => {
     const email = req.body.email.toString();
     const password = req.body.password.toString();
 
@@ -15,67 +71,39 @@ exports.login = async(req, res) => {
 
     // find user in database - update for providers
     const foundPatient = await patient.findOne({ email }).exec();
-    const foundProvider = await provider.findOne({ email }).exec();
-    let foundUser = foundPatient;
-    let role = 0;
 
-    if (!foundUser && !foundProvider) { 
-        console.log("Patient/Provider not found.")
+    if (foundPatient) { 
+        console.log("Patient not found.")
         return res.status(401).json({ message: 'Invalid email or password' });
-    } else if (foundProvider) {
-        console.log("Provider account found")
-        role = 1;
-        foundUser = foundProvider;
-    } else {
-        console.log("Patient found.")
-        role = 2;
     }
+    console.log("Patient found.")
+    role = 2;
 
-    const match = password == foundUser.password ? true : false;
+    const match = password == foundPatient.password ? true : false;
 
     if (!match) {
         console.log("Password doesn't match")
         return res.status(401).json({ message: 'Invalid email or password' });
     }
-
-    // role 1: provider, role 2: patient
-    let accessToken = null
-    if (role == 1) {
-        accessToken = jwt.sign(
-            {
-                "UserInfo": {
-                    "id": foundUser.id,
-                    "role": role,
-                    "firstName": foundUser.firstName,
-                    "lastName": foundUser.lastName,
-                    "practiceID": foundUser.practiceID
-                }
-            },
-            process.env.ACCESS_TOKEN_SECRET,
-            { expiresIn: '5m'}
-        )
-    }
-    else {
-        accessToken = jwt.sign(
-            {
-                "UserInfo": {
-                    "id": foundUser.id,
-                    "role": role,
-                    "firstName": foundUser.firstName,
-                    "lastName": foundUser.lastName,
-                    "practiceID": foundUser.practiceID,
-                    "status": foundUser.status,
-                    "email": foundUser.email
-                }
-            },
-            process.env.ACCESS_TOKEN_SECRET,
-            { expiresIn: '5m'}
-        )
-    }
+    let accessToken = jwt.sign(
+        {
+            "UserInfo": {
+                "id": foundPatient.id,
+                "role": role,
+                "firstName": foundPatient.firstName,
+                "lastName": foundPatient.lastName,
+                "practiceID": foundPatient.practiceID,
+                "status": foundPatient.status,
+                "email": foundPatient.email
+            }
+        },
+        process.env.ACCESS_TOKEN_SECRET,
+        { expiresIn: '5m'}
+    )
     
 
     const refreshToken = jwt.sign(
-        { "id": foundUser.id },
+        { "id": foundPatient.id },
         process.env.REFRESH_TOKEN_SECRET,
         { expiresIn: '30m'}
     )
