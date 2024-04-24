@@ -63,36 +63,31 @@ export default function PatientDetails({ route, navigation }) {
     3 - Get the patient's most recent treatment
     */
     const getLastTreatment = async () => {
-      let treatment = await axios.get(`http://localhost:5000/api/getLastTreatment/${patient._id}`)  
-      if(treatment.data[0].attended == false && (patient.treatments.length > 2)){
-        treatment = await axios.get(`http://localhost:5000/api/getSecondLastTreatment/${patient._id}`)
-      }
+      let treatment = await axios.get(`http://localhost:5000/api/getLastTreatment/${patient._id}`) 
 
       let practiceBottles = protocol.bottles
-      let lT = { bottles: [] }
+      let latestData = { 
+        bottles: [],
+        daysSinceLast: -1,
+      }
       // If we get a treatment
-      if (treatment.data.length > 0) {
+      if (treatment && treatment.data.length > 0) {
+        let latest = treatment.data[0];
 
-        let matches = true;
-        practiceBottles.map((bottle, index) => {
-          if (bottle.bottleName != treatment.data[0].bottles[index].nameOfBottle) {
-            matches = false;
-          }
-        })
+        let treatmentDate = new Date(latest.date);
+        let curDate = new Date();
 
-        if (matches == false) {
-          for (let i = 0; i < practiceBottles.length; i++) {
-            lT.bottles[i] = {
-              injVol: '[Unavailable]',
-              currBottleNumber: '[Unavailable]'
+        latestData = { bottles: practiceBottles.map((bottle, index) => {
+            if (bottle.bottleName != latest.bottles[index].nameOfBottle) {
+              return {
+                injVol: '[Unavailable]',
+                currBottleNumber: '[Unavailable]'
+              }
             }
-          }
+            return { injVol: latest.bottles[index].injVol, currBottleNumber: latest.bottles[index].currBottleNumber }
+          }),
+          daysSinceLast: Math.round( (curDate.getTime() - treatmentDate.getTime()) / (1000 * 3600 * 24))
         }
-        else {
-          lT = treatment.data[0]
-        }
-
-        setLastTreatment(lT)
       }
       else {
         const bottle = {
@@ -101,10 +96,10 @@ export default function PatientDetails({ route, navigation }) {
         }
 
         for (let i = 0; i < practiceBottles.length; i++) {
-          lT.bottles[i] = bottle
+          latestData.bottles.push(bottle);
         }
       }
-      setLastTreatment(lT)
+      setLastTreatment(latestData)
     }
     if (!lastTreatment && protocol && patient) { getLastTreatment(); }
 
@@ -179,7 +174,7 @@ export default function PatientDetails({ route, navigation }) {
           {/* PROGRESS */}
           <View style={{ flex: 1, flexDirection: 'row', paddingTop: 7 }}>
             <Text style={styles.prompt3}>Progress: </Text>
-            <Text style={{ ...styles.data2, alignSelf: 'center', }}>{percent[index]*100 + "\%"}</Text>
+            <Text style={{ ...styles.data2, alignSelf: 'center', }}>{percent[index] + "\%"}</Text>
           </View>
 
           {/* LAST INJECTION */}
@@ -275,6 +270,26 @@ export default function PatientDetails({ route, navigation }) {
     </View>
   )
 
+  const DaysSinceLastTreatment = () => {
+    // Check valid number
+    if (lastTreatment.daysSinceLast < 0) return
+
+    // Is date in attrition?
+    let style = styles.data3;
+    if (protocol.missedDoseAdjustment.length > 0) {
+      let thresholdDays = protocol.missedDoseAdjustment[0].daysMissed;
+      if (lastTreatment.daysSinceLast >= thresholdDays) style = styles.warning 
+    }
+    
+    console.log("returns");
+    return (
+      <View style={{ flex: 1, flexDirection: 'row', paddingTop: 7 }}>
+        <Text style={styles.prompt3}>Days since last treatment: </Text>
+        <Text style={style}>{lastTreatment.daysSinceLast}</Text>
+      </View>
+    )
+  }
+
   const TreatmentInfo = () => (
     <View style={styles.section}>
       {/* TITLE */}
@@ -289,6 +304,8 @@ export default function PatientDetails({ route, navigation }) {
         <Text style={styles.prompt3}>Frequency of injections: </Text>
         <Text style={styles.data3}>[{protocol.injectionFrequency.freq}] {protocol.injectionFrequency.interval}</Text>
       </View>
+      
+      {DaysSinceLastTreatment()}
     </View>
   )
 
@@ -385,6 +402,13 @@ const styles = StyleSheet.create({
   },
   data3: {
     fontSize: 16,
+    marginRight: 10,
+    marginTop: 2,
+  },
+  warning: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#e33d37',
     marginRight: 10,
     marginTop: 2,
   },

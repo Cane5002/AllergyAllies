@@ -56,15 +56,15 @@ export default function Maintenance({route, navigation}){
       pages:
          [
             {
-               name: "main page",
+               name: "bottles",
                elements: protocol.bottles.map((vial, index) => {
                   return {
-                     name: String(index),
+                     name: `${vial.bottleName}Panel`,
                      title: vial.bottleName,
                      type: 'panel',
                      elements: [
                         {
-                           name: 'bottleNum' + index,
+                           name: `${vial.bottleName}`,
                            title: 'Maintenance Bottle Number:',
                            type: 'text',
                            inputType: 'numeric',
@@ -88,24 +88,28 @@ export default function Maintenance({route, navigation}){
    // Apply theme to survey
    bottleForm.applyTheme(theme);
 
+   // Apply Default values
+   for (let b of patient.maintenanceBottleNumber) {
+      bottleForm.setValue(b.nameOfBottle, b.maintenanceNumber);
+   }
+
    bottleForm.onComplete.add((sender, options) => {
-      updateMaintenanceBottles(sender.data, protocol.bottles, {patient});
+      updateMaintenanceBottles(sender.data, protocol.bottles, patient);
   });
 
    return <Survey model={bottleForm} />;
 }
 
 const updateMaintenanceBottles = async (data, bottles, patient) => {
-   let bottleNums = []
-   const numBottles = bottles.map((bottle, index) => {
-    const bottleData = {
-        nameOfBottle: bottle.bottleName,
-        maintenanceNumber: eval(`data.bottleNum${index}`)
-    }
-      bottleNums.push(bottleData)
+   let maintenanceBottleNumber = bottles.map((b) => {
+      return {
+         nameOfBottle: b.bottleName,
+         maintenanceNumber: data[b.bottleName]
+     }
    })
+   console.log(maintenanceBottleNumber)
 
-   const update = await axios.patch(`http://localhost:5000/api/${patient.patient.email}/updateMaintenanceBottleNums`, bottleNums)
+   const update = await axios.put(`http://localhost:5000/api/updateMaintenanceBottleNums/${patient._id}`, maintenanceBottleNumber)
    location.reload();
 }
 
