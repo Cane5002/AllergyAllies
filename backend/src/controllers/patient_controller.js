@@ -260,15 +260,16 @@ const findPercentMaintenance = async (req, res) => {
                 continue;
             }
             // Total Calc
-            let totalBottleSteps = mBottle.maintenanceNumber - 1;
+            let totalBottleSteps = mBottle.maintenanceNumber;
             let totalVolumeSteps = Math.ceil(( foundProtocol.nextDoseAdjustment.maxInjectionVol - foundProtocol.nextDoseAdjustment.startingInjectionVol ) / foundProtocol.nextDoseAdjustment.injectionVolumeIncreaseInterval) + 1;
             let totalSteps = totalBottleSteps * totalVolumeSteps;
             // Current Calc
-            let curBottleSteps = (curBottle.currBottleNumber == 'M' ? mBottle.maintenanceNumber : curBottle.currBottleNumber) - 1;
-            console.log(curBottle.curBottleNumber);
+            let curBottleSteps = (curBottle.currBottleNumber == 'M' ? mBottle.maintenanceNumber : curBottle.currBottleNumber);
             let curVolumeSteps = Math.ceil(( curBottle.injVol - foundProtocol.nextDoseAdjustment.startingInjectionVol ) / foundProtocol.nextDoseAdjustment.injectionVolumeIncreaseInterval ) + 1;
             let curSteps = Math.max(curBottleSteps-1, 0) * totalVolumeSteps + curVolumeSteps;
-            array.push(Math.round(curSteps / totalSteps * 100)/100); //2 Decimal places
+            // console.log(`${totalSteps} = ${totalBottleSteps} * ${totalVolumeSteps}`);
+            // console.log(`${curSteps} <= ${curBottleSteps} : ${curVolumeSteps}`);
+            array.push(Math.round(curSteps / totalSteps * 100)); //2 Decimal places
         }
 
         return res.status(200).json({array, message: `Array of maintenance sent`});

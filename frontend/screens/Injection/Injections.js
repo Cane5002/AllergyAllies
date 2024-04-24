@@ -20,7 +20,6 @@ export default function Injections({route, navigation}){
    // Protocol information
    const [protocol, setProtocol] = useState();
    const [queriedProtocol, setQueriedProtocol] = useState(false);
-   let [nextTreatment, setNextTreatment] = useState();
    let [lastTreatment, setLastTreatment] = useState();
 
    // Today's date
@@ -28,13 +27,6 @@ export default function Injections({route, navigation}){
 
    // Current Patient
    const {patient} = route.params
-
-   // Calculated value - NEEDS TO BE UPDATED WITH JIMMY'S CALCULATIONS
-   let [arrayOfBottles, setArrayOfBottles] = useState(Array(99).fill({
-      injVol: 0,
-      injDilution: 0,
-      currBottleNumber: "1",
-   }));
 
    useEffect(() => {
       const findProtocol = async() => {
@@ -53,51 +45,127 @@ export default function Injections({route, navigation}){
             return ('Something went wrong');
          }
       }
-      if (!queriedProtocol) {findProtocol();}
+      if (!queriedProtocol) findProtocol();
 
       const findTreatment = async() => {
          try {
-            const data = {
-               patientID: patient._id,
-               practiceID: userInfo.practiceID
-            }
+            let response = await axios.get(`http://localhost:5000/api/getLastTreatment/${patient._id}`);
 
-            setLastTreatment(await axios.get(`http://localhost:5000/api/getLastTreatment/${patient._id}`))
-            if(lastTreatment.data[0].attended && calcOnce){
-                  calcOnce = false;
-                  await axios.post(`http://localhost:5000/api/nextTreatment`, data)
-                  setNextTreatment(lastTreatment.data[0])
-                  /*
-                     Read the new numbers and print them
-                  */
-                  setLastTreatment(await axios.get(`http://localhost:5000/api/getLastTreatment/${patient._id}`));
-                  setArrayOfBottles(lastTreatment.data[0].bottles);
-                  //setNextTreatment(lastTreatment.data[0].bottles);
-            }
-            else{
-                  /*
-                     Read the last calculated numbers and print them
-                  */
-                  setLastTreatment(await axios.get(`http://localhost:5000/api/getLastTreatment/${patient._id}`));
-                  setArrayOfBottles(lastTreatment.data[0].bottles);
-                  setNextTreatment(lastTreatment.data[0]);
-            }
-            //setNextTreatment(lastTreatment.data[0].bottles);
+            if (response && response.data.length > 0) setLastTreatment(response.data[0])
+            else setLastTreatment({
+               bottles: protocol.bottles.map((b) => {
+                  return {
+                     nameOfBottle: b.bottleName,
+                     injVol: 0,
+                     injDilution: 0,
+                     currBottleNumber: 1,
+                     date: new Date().setHours(0,0,0,0),
+                     adverseReaction: false,
+                  }
+               })
+            })
          }
          catch (err) {
             return ('Something went wrong');
          }
       }
-      if (!nextTreatment) {findTreatment();}
-      /*
-         Displays correct values on update, but numbers will glitch around
-      */
-      if(lastTreatment != undefined){
-         setArrayOfBottles(lastTreatment.data[0].bottles);
-      }
+      if (!lastTreatment) findTreatment();
+
    }, [lastTreatment])
-   if (!protocol || !nextTreatment) return ('Loading protocol and injection data...');
+   if (!protocol || !lastTreatment) return ('Loading protocol and injection data...');
    
+   // Calculate Next Treatment (Verify calc method with Dr.Williams)
+   const getMaintenanceBottle = (bottleName) => {
+      let bottle = patient.maintenanceBottleNumber.find((b) => {
+         return bottleName === b.nameOfBottle.replace(/^"(.*)"$/, '$1');
+      });
+      return bottle.maintenanceNumber;
+   }
+   const applyAdjustment = (data, adj) => {
+      switch (adj.action) {
+         case 'Decrease Injection Volume':
+            data.injVol = Math.max(data.injVol - adj.decreaseInjectionVol, protocol.nextDoseAdjustment.startingInjectionVol);
+            console.log(data.injVol);
+            break;
+         case 'Dilute Vial':
+            data.injDilution = Math.max(data.injDilution -  adj.decreaseVialConcentration, 0); break;
+         case 'Reduce Bottle Number':
+            data.currBottleNumber = Math.max((data.currBottleNumber == 'M' ? getMaintenanceBottle(data.nameOfBottle) : data.currBottleNumber) -  adj.decreaseBottleNumber, 1); break;
+         default: 
+            console.log("Unrecognized action was applied");
+      }
+      return data;
+   }
+   let treatmentDate = new Date(lastTreatment.date);
+   let curDate = new Date();
+   let daysSinceLast = Math.round( (curDate.getTime() - treatmentDate.getTime()) / (1000 * 3600 * 24));
+   const nextTreatment = protocol.bottles.map((bottle) => {
+      let previous = lastTreatment.bottles.find((b) => {
+         return bottle.bottleName === b.nameOfBottle.replace(/^"(.*)"$/, '$1');
+      });
+      if (!previous) {
+         return {
+            nameOfBottle: bottle.bottleName,
+            injVol: protocol.nextDoseAdjustment.startingInjectionVol,
+            injDilution: 0.1,
+            currBottleNumber: 1,
+         }
+      }
+      let data = {
+         nameOfBottle: bottle.bottleName,
+         injVol: previous.injVol,
+         injDilution: previous.injDilution,
+         currBottleNumber: previous.currBottleNumber,
+      }
+
+      // *** Should each trigger stack??
+      // ATTRITION
+      let attritioned = false;
+      // Missed Dose
+      if (protocol.triggers.includes('Missed Injection Adjustment') && protocol.missedDoseAdjustment.length > 0) {
+         // Find longest missedDoseAdjustment that applies
+         let adjustment;
+         for (let adj of protocol.missedDoseAdjustment) {
+            if (daysSinceLast >= adj.daysMissed && ( !adjustment || adj.daysMissed >= adjustment.daysMissed )) adjustment = adj;
+         }
+
+         // If one applies, attrition
+         if (adjustment) {
+            console.log("Missed Dose Attrition")
+            data = applyAdjustment(data, adjustment);
+            attritioned = true;
+         }
+      }
+      // Large Reaction
+      if (protocol.triggers.includes('Large Local Reaction') && previous.adverseReaction) {
+         console.log("Large Reaction Attrition")
+         data = applyAdjustment(data, protocol.largeReactionDoseAdjustment);
+         attritioned = true;
+      }
+      // Test Reaction
+      if (protocol.triggers.includes('Vial Test Reaction')) {
+         console.log("Test Reaction Attrition")
+         /* Not implemented */
+      }
+
+      //PROGRESS
+      if (!attritioned) {
+         // Escalate?
+         if (data.injVol == protocol.nextDoseAdjustment.maxInjectionVol && data.currBottleNumber != 'M')  {
+            console.log("Escalate")
+            data.currBottleNumber += 1;
+            if (data.currBottleNumber == getMaintenanceBottle(bottle.bottleName)) data.currBottleNumber = 'M';
+            data.injVol = protocol.nextDoseAdjustment.startingInjectionVol;
+            // ***Increase dilution??
+         }
+         // Buildup
+         else {
+            console.log("Buildup")
+            data.injVol += protocol.nextDoseAdjustment.injectionVolumeIncreaseInterval;
+         }
+      }
+      return data;
+   })
 
    // Input Fields
    const InjectionQuestions = {
@@ -109,10 +177,10 @@ export default function Injections({route, navigation}){
          [
             {
                name: "main page",
-               elements: protocol.bottles.map((vial, index) => {
+               elements: nextTreatment.map((bottle, index) => {
                   return index % 2 == 0 ? {
                      name: String(index),
-                     title: vial.bottleName,
+                     title: bottle.nameOfBottle,
                      type: 'panel',
                      elements: [
                         {
@@ -120,7 +188,7 @@ export default function Injections({route, navigation}){
                            title: 'Injection Volume:',
                            type: 'text',
                            inputType: 'numeric',
-                           defaultValue: arrayOfBottles[index].injVol,
+                           defaultValue: bottle.injVol,
                            enableIf: `{b${index}} == "Edit"`,
                            isRequired: true
                         },
@@ -129,7 +197,7 @@ export default function Injections({route, navigation}){
                            title: 'Bottle Number:',
                            type: 'text',
                            inputType: 'numeric',
-                           defaultValue: arrayOfBottles[index].currBottleNumber,
+                           defaultValue: bottle.currBottleNumber,
                            startWithNewLine: false,
                            enableIf: `{b${index}} == "Edit"`,
                            isRequired: true
@@ -139,7 +207,7 @@ export default function Injections({route, navigation}){
                            title: 'Injection Dilution:',
                            type: 'text',
                            inputType: 'numeric',
-                           defaultValue: arrayOfBottles[index].injDilution,
+                           defaultValue: bottle.injDilution,
                            startWithNewLine: false,
                            enableIf: `{b${index}} == "Edit"`,
                            isRequired: true
@@ -173,7 +241,7 @@ export default function Injections({route, navigation}){
                   } :
                   {
                      name: String(index),
-                     title: vial.bottleName,
+                     title: bottle.nameOfBottle,
                      type: 'panel',
                      startWithNewLine: 'false',
                      elements: [
@@ -182,7 +250,7 @@ export default function Injections({route, navigation}){
                            title: 'Injection Volume:',
                            type: 'text',
                            inputType: 'numeric',
-                           defaultValue: arrayOfBottles[index].injVol,
+                           defaultValue: bottle.injVol,
                            enableIf: `{b${index}} == "Edit"`,
                            isRequired: true
                         },
@@ -191,7 +259,7 @@ export default function Injections({route, navigation}){
                            title: 'Bottle Number:',
                            type: 'text',
                            inputType: 'numeric',
-                           defaultValue: arrayOfBottles[index].currBottleNumber,
+                           defaultValue: bottle.currBottleNumber,
                            startWithNewLine: false,
                            enableIf: `{b${index}} == "Edit"`,
                            isRequired: true
@@ -201,7 +269,7 @@ export default function Injections({route, navigation}){
                            title: 'Injection Dilution:',
                            type: 'text',
                            inputType: 'numeric',
-                           defaultValue: arrayOfBottles[index].injDilution,
+                           defaultValue: bottle.injDilution,
                            startWithNewLine: false,
                            enableIf: `{b${index}} == "Edit"`,
                            isRequired: true
@@ -248,9 +316,9 @@ export default function Injections({route, navigation}){
    injectionForm.applyTheme(theme);
 
    injectionForm.onComplete.add((sender, options) => {
+      console.log(sender.data);
       createInjectionObject(sender.data, protocol.bottles, patient);
-  });
-  console.log("How many")
+   });
    return <Survey model={injectionForm} />;
 }
 
@@ -269,23 +337,16 @@ const createInjectionObject = async (data, bottles, patient) => {
       Injections.push(bottleInjection)
    })
 
-   const obj = {
+   const treatment = {
       patientID: patient._id,
-      /*
-         Reason why this doesn't work during testing, we are updating a treatment with the same date
-         This date needs to be updated during testing like this:
-         date: new Date('2023-12-17').setHours(0,0,0,0), 
-         Then BEFORE clicking submit increment date by at least 1 day to allow nextTreatment to work
-
-         IN PRODUCTION: date: new Date().setHours(0,0,0,0),
-      */
-      date: new Date('2024-01-09').setHours(0,0,0,0),
-      arrayOfBottles: Injections
+      practiceID: patient.practiceID,
+      date: new Date().setHours(0,0,0,0),
+      bottles: Injections
    }
    
    // Send the treatment obj to the database
    console.log("Treatment added, check the date!")
-   const sendSuccessfulTreatment = await axios.patch(`http://localhost:5000/api/updateSuccessfulTreatment`, obj);
-
+   const sendSuccessfulTreatment = await axios.post(`http://localhost:5000/api/addTreatment`, treatment);
+   location.reload();
 }
 
