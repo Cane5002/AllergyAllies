@@ -31,8 +31,6 @@ exports.addProvider = async (req, res) => {
         // Check if the email already has an associated account
         let emailResponse = await provider.findOne({email})
         if (emailResponse) return res.status(200).json({message: 'This email is already associated with an account!'});
-        
-        /*"Cannot read properties of undefined (reading 'ProviderNPIs')"*/
 
         const providerCode = generateRandomCode();
         const newProvider = new provider({

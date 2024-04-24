@@ -1,5 +1,6 @@
 const patient = require('../Models/patient');
 const protocols = require('../Models/protocols');
+const practice = require('../Models/practice');
 const provider = require('../Models/provider');
 const treatment = require('../Models/treatment');
 
@@ -7,18 +8,27 @@ const treatment = require('../Models/treatment');
 const addPatient = async (req, res) => {
     // implement duplicate check
     try {
-        const { firstName, lastName, email, phone, password, DoB, height, weight, practiceID } = req.body;
+        const { firstName, lastName, email, phone, password, DoB, height, weight, practiceCode } = req.body;
 
-        const data = new patient({
-            firstName, lastName, email, phone, password, DoB, height, weight, practiceID
+        // Validate new Patient
+            // Practice Code
+        let codeResponse = await practice.findOne({practiceCode});
+        if (!codeResponse) return res.status(200).json({message: 'Incorrect practice code!'});
+        console.log(codeResponse);
+        // Check if the email already has an associated account
+        let emailResponse = await patient.findOne({email})
+        if (emailResponse) return res.status(200).json({message: 'This email is already associated with an account!'});
+
+        const newPatient = new patient({
+            firstName, lastName, email, phone, password, DoB, height, weight, practiceID: codeResponse._id
         });
-        data.status = "ACTIVE";
-        data.tokens = 0;
-        data.statusDate = new Date();
-        data.lastApptDateBeforeAttrition = new Date();
-        data.missedAppointmentCount = 0;
+        newPatient.status = "ACTIVE";
+        newPatient.tokens = 0;
+        newPatient.statusDate = new Date();
+        newPatient.lastApptDateBeforeAttrition = new Date();
+        newPatient.missedAppointmentCount = 0;
 
-        const protocol = await protocols.findOne({ practiceID: practiceID });
+        const protocol = await protocols.findOne({ practiceID: codeResponse._id });
 
         if (protocol) {
             const bottles = protocol.bottles;
@@ -30,14 +40,14 @@ const addPatient = async (req, res) => {
                 })
             })
 
-            data.maintenanceBottleNumber = b
+            newPatient.maintenanceBottleNumber = b
         }
 
-        const dataToSave = await data.save();
-        return res.status(200).json(dataToSave);
+        const savedPatient = await newPatient.save();
+        return res.status(201).json(savedPatient);
     }
     catch (error) {
-        return res.status(400).json({ message: error.message });
+        return res.status(500).json({ message: error.message });
     }
 }
 

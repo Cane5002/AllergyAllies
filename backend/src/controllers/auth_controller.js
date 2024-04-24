@@ -72,7 +72,7 @@ exports.patientLogin = async(req, res) => {
     // find user in database - update for providers
     const foundPatient = await patient.findOne({ email }).exec();
 
-    if (foundPatient) { 
+    if (!foundPatient) { 
         console.log("Patient not found.")
         return res.status(401).json({ message: 'Invalid email or password' });
     }
