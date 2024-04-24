@@ -48,22 +48,29 @@ export default function Injections({route, navigation}){
       if (!queriedProtocol) findProtocol();
 
       const findTreatment = async() => {
+         console.log("Finding Last Treatment")
          try {
             let response = await axios.get(`http://localhost:5000/api/getLastTreatment/${patient._id}`);
 
-            if (response && response.data.length > 0) setLastTreatment(response.data[0])
-            else setLastTreatment({
-               bottles: protocol.bottles.map((b) => {
-                  return {
-                     nameOfBottle: b.bottleName,
-                     injVol: 0,
-                     injDilution: 0,
-                     currBottleNumber: 1,
-                     date: new Date().setHours(0,0,0,0),
-                     adverseReaction: false,
-                  }
+            if (response && response.data.length > 0) { 
+               console.log("Set to found");
+               setLastTreatment(response.data[0])
+            }
+            else {
+               console.log("Set to temp");
+               setLastTreatment({
+                  bottles: protocol.bottles.map((b) => {
+                     return {
+                        nameOfBottle: b.bottleName,
+                        injVol: 0,
+                        injDilution: 0,
+                        currBottleNumber: 1,
+                        date: new Date().setHours(0,0,0,0),
+                        adverseReaction: false,
+                     }
+                  })
                })
-            })
+            }
          }
          catch (err) {
             return ('Something went wrong');
@@ -71,8 +78,9 @@ export default function Injections({route, navigation}){
       }
       if (!lastTreatment) findTreatment();
 
-   }, [lastTreatment])
-   if (!protocol || !lastTreatment) return ('Loading protocol and injection data...');
+   })
+   if (!protocol) return ('Loading protocol and injection data...');
+   if (!lastTreatment) return ('Loading injection data');
    
    // Calculate Next Treatment (Verify calc method with Dr.Williams)
    const getMaintenanceBottle = (bottleName) => {
