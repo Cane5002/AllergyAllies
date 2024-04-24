@@ -20,19 +20,6 @@ export default function PracticeEnrollment() {
     setDisplay('')
     if (practiceName && providerNPIs && phoneNumber && address && email && officeHours && allergyShotHours && practiceCode) {
         try {
-          console.log(providerNPIs);
-          for (let npi of providerNPIs) {
-            if (isNaN(parseInt(npi))) {
-              setDisplay(`Povider NPI ${npi} must be a number`);
-              success = false;
-              return;
-            }
-            if (npi.length != 10) {
-              setDisplay(`Povider NPI ${npi} must be 10 digits`);
-              success = false;
-              return;
-            }
-          }
 
           const data = {
             practiceName,
@@ -44,28 +31,15 @@ export default function PracticeEnrollment() {
             allergyShotHours,
             practiceCode
           }
-          
-
-          const practiceNameExists = await axios.get(`http://localhost:5000/api/practiceByName/${practiceName}`);
-          console.log(practiceNameExists.status);
-
-          if (practiceNameExists.status === 200) {
-            setDisplay('This practice is already enrolled!');
-            success = false;
-            return;
-          }
-
-          const practiceCodeExists = await axios.get(`http://localhost:5000/api/practiceByCode/${practiceCode}`);
-          console.log(practiceCodeExists.status);
-
-          if (practiceCodeExists.status === 200) {
-            setDisplay('This Practice Code is already in use!');
-            success = false;
-            return;
-          }
 
           const response = await axios.post('http://localhost:5000/api/addPractice', data);
           console.log(response);
+
+          if (response.status != 201) {
+            setDisplay(response.data.message);
+            success = false;
+            return;
+          }
         }
         catch (error) {
           success = false;
@@ -98,18 +72,29 @@ export default function PracticeEnrollment() {
 
       <Text style={styles.subHeading}>Provider NPI's</Text>
       {providerNPIs.map((npi, index) => (
-        <TextInput style={styles.inputNPI}
-          key = {index}
-          underlineColorAndroid="transparent"
-          placeholder="Provider NPI"
-          placeholderTextColor="#7a7a7a"
-          value={npi}
-          autoCapitalize="none"
-          onChangeText={(text) => setProviderNPIs((prevNPIs) => {
+        <View style={{ flex: 1, flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }} key={index}>
+          <TextInput 
+            style={styles.inputNPI}
+            underlineColorAndroid="transparent"
+            placeholder="Provider NPI"
+            placeholderTextColor="#7a7a7a"
+            value={npi}
+            autoCapitalize="none"
+            onChangeText={(text) => setProviderNPIs((prevNPIs) => {
+                const updatedNPIs = [...prevNPIs];
+                updatedNPIs[index] = text;
+                return updatedNPIs;
+          })} />
+          <TouchableOpacity
+            style = {styles.removeProviderButton}
+            onPress={() => setProviderNPIs((prevNPIs) => {
               const updatedNPIs = [...prevNPIs];
-              updatedNPIs[index] = text;
+              updatedNPIs.splice({index}, 1);
               return updatedNPIs;
-        })} />
+            }) }>
+            <Text style = {styles.addProviderButtonText}>-</Text>
+          </TouchableOpacity>
+        </View>
       ))}
       <TouchableOpacity
         style = {styles.addProviderButton}
@@ -235,10 +220,10 @@ const styles = StyleSheet.create({
   },
   addProviderButton: {
     backgroundColor: '#1059d5',
-    width: height > width ? null : 136,
     padding: 10,
     margin: 5,
     height: 20,
+    width: height > width ? null : 136,
     justifyContent: 'center',
     borderRadius: 8,
   },
@@ -246,6 +231,15 @@ const styles = StyleSheet.create({
     color: 'white',
     textAlign: 'center',
     fontSize: 10,
+  },
+  removeProviderButton: {
+    backgroundColor: '#d32d27',
+    padding: 10,
+    margin: 5,
+    height: 40,
+    width: 40,
+    justifyContent: 'center',
+    borderRadius: 8,
   },
   logInButton: {
     backgroundColor: '#1059d5',

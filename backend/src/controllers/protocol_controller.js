@@ -7,44 +7,47 @@ const addProtocol = async (req, res) => {
             practiceID,
             nextDoseAdjustment,
             bottles,
-            vialTestReactionAdjustment,
+            injectionFrequency,
+            triggers,
             missedDoseAdjustment,
-            largeReactionsDoseAdjustment,
-            injectionFrequency
+            largeReactionDoseAdjustment,
+            vialTestReactionAdjustment,
         } = req.body
 
         const data = new protocol ({
             practiceID,
             nextDoseAdjustment,
             bottles,
-            vialTestReactionAdjustment,
+            injectionFrequency,
+            triggers,
             missedDoseAdjustment,
-            largeReactionsDoseAdjustment,
-            injectionFrequency
+            largeReactionDoseAdjustment,
+            vialTestReactionAdjustment,
         })
         const dataToSave = await data.save();
         res.status(200).json(dataToSave);
     }
     catch (error) {
-        return res.status(400).json({ message: error.message });
+        return res.status(500).json({ message: error.message });
     }
 }
 
 const updateProtocol = async (req, res) => {
     try {
-        const practiceID = req.params.practiceID
+        let practiceID = req.params.practiceID
 
-        const query = { practiceID : practiceID }
-        let foundProtocol = await protocol.findOneAndUpdate(query, req.body, {new: true});
+        console.log(req.body);
+        let query = { practiceID }
+        let newProtocol = await protocol.findOneAndUpdate(query, req.body, {new: true});
         //console.log(req.body);
 
-        if (!foundProtocol) {
+        if (!newProtocol) {
             return res.status(400).json({ message: "Protocol not found"});
         }
-
-        return res.status(200).json({ protocol: foundProtocol });
+        console.log(newProtocol);
+        return res.status(200).json({ protocol: newProtocol });
     } catch (err) {
-        return res.status(400).json({ message: err.message });
+        return res.status(500).json({ message: err.message });
     }
 }
 
@@ -59,7 +62,7 @@ const getProtocol = async (req, res) => {
 
         return res.status(200).json({ protocol: foundProtocol });
     } catch (err) {
-        return res.status(400).json({ message: err.message });
+        return res.status(500).json({ message: err.message });
     }
 }
 

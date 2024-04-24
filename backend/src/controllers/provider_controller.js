@@ -1,3 +1,4 @@
+const practice = require('../Models/practice');
 const provider = require('../Models/provider');
 const crypto = require('crypto');
 
@@ -10,17 +11,39 @@ function generateRandomCode() {
 // Post method - TEST CRYPTO, TEST USAGE OF PRACTICE ID, GENERATE PRACTICE ID
 exports.addProvider = async (req, res) => {
     try {
-        const { firstName, lastName, email, password, NPI, practiceID} = req.body;
+        const { firstName, lastName, email, password, NPI, practiceCode} = req.body;
+
+        // Validate New Provider
+            //Practice Code
+        let codeResponse = await practice.findOne({practiceCode});
+        if (!codeResponse) return res.status(200).json({message: 'Incorrect practice code!'});
+        console.log(codeResponse);
+            //NPI
+        // Used to check if provider has a valid NPI, WIP
+        //const NPIreigstryURI = `https://npiregistry.cms.hhs.gov/api/?number=${NPI}&pretty=&version=2.1`
+        // const NPIreigstryURI = `https://clinicaltables.nlm.nih.gov/api/npi_org/v3/search?terms=${NPI}`
+        //const NPIexists = await axios.get(NPIreigstryURI);
+        if (!codeResponse.providerNPIs) return res.status(200).json({message: 'Error accessing your practice'});
+        if (!codeResponse.providerNPIs.includes(NPI)) return res.status(200).json({message: 'This NPI has not been approved by your practice!'});
+        // Check if npi is already in use
+        let npiResponse = await provider.findOne({NPI});
+        if (npiResponse) return res.status(200).json({message: 'Please confirm that this is your NPI'});
+        // Check if the email already has an associated account
+        let emailResponse = await provider.findOne({email})
+        if (emailResponse) return res.status(200).json({message: 'This email is already associated with an account!'});
+        
+        /*"Cannot read properties of undefined (reading 'ProviderNPIs')"*/
+
         const providerCode = generateRandomCode();
-        const data = new provider({
-            firstName, lastName, email, password, NPI, practiceID, providerCode
+        const newProvider = new provider({
+            firstName, lastName, email, password, NPI, practiceID: codeResponse._id, providerCode
         });
 
-        const dataToSave = await data.save();
-        res.status(200).json(dataToSave);
+        let savedProvider = await newProvider.save();
+        res.status(201).json(savedProvider);
     }
     catch (error) {
-        res.status(400).json({ message: error.message });
+        res.status(500).json({ message: error.message });
     }
 }
 

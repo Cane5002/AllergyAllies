@@ -7,6 +7,6 @@ router.post('/addProtocol', protocolController.addProtocol);
 //get protocol
 router.get('/getProtocol/:practiceID', protocolController.getProtocol);
 //patch protocol
-router.patch('/updateProtocol/:practiceID', protocolController.updateProtocol);
+router.put('/updateProtocol/:practiceID', protocolController.updateProtocol);
 
 module.exports = router;

@@ -54,7 +54,7 @@ export default function Reports({ navigation }) {
         type: format,
         headers: getHeaders(report.reportType),
         fileName: report.reportName, 
-        headerStyle: 'font-weight: bold; padding: 5px; border: 1px solid #dddddd;',
+        headerStyle: 'font-weight: bold; padding: 5px; border: 1px solid #dddddd; color: #1059d5',
         cellStyle: 'padding: 5px; border: 1px solid #dddddd;',
         documentTitle: practiceResponse.data.practiceName + ": " + report.reportName.replace(/_/g, ' '),
         documentTitleStyle: 'font-weight: bold; padding: 10px; font-size: 30px'

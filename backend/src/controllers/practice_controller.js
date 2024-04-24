@@ -1,20 +1,89 @@
 const { resolveSoa } = require('dns');
 const practice = require('../Models/practice');
+const protocol = require('../Models/protocols');
 const multer = require('multer');
 const path = require('path');
 
 exports.addPractice = async (req, res) => {
     try {
         const { practiceName, providerNPIs, phoneNumber, email, address, officeHours, allergyShotHours, practiceCode } = req.body;
-        const data = new practice({
+
+        
+        let nameResponse  = await practice.findOne({practiceName});
+        if (nameResponse) return res.status(200).json({message: 'This name is already taken!'});
+        
+        let codeResponse  = await practice.findOne({practiceCode});
+        if (codeResponse) return res.status(200).json({message: 'This Practice Code is already in use!'});
+        
+        for (let npi of providerNPIs) {
+            if (isNaN(parseInt(npi))) return res.status(200).json({message: `Povider NPI ${npi} must be a number`});
+            if (npi.length != 10) return res.status(200).json({message: `Povider NPI ${npi} must be 10 digits`});
+        }
+
+        let newPractice = new practice({
             practiceName, providerNPIs, phoneNumber, email, address, officeHours, allergyShotHours, practiceCode
         });
-        // PREVENT DUPLICATES
-        console.log(req.body);
-        const dataToSave = await data.save();
-        return res.status(200).json(dataToSave);
+        let savedPractice = await newPractice.save();
+
+        // "protocol validation failed: practiceID: Path `practiceID` is required."
+        let defaultProtocol = new protocol({
+            practiceID: savedPractice._id,
+            injectionFrequency: {
+                freq: 2,
+                interval: "Weekly"
+            },
+            bottles: [],
+            nextDoseAdjustment: {
+                startingInjectionVol: 0.05,
+                maxInjectionVol: 0.05,
+                injectionVolumeIncreaseInterval: 5,
+            },
+            triggers: ['Missed Injection Adjustment', 'Large Local Reaction', 'Vial Test Reaction'],
+            largeReactionDoseAdjustment: {
+                whealLevelForAdjustment: 11,
+                action: 'Decrease Injection Volume',
+                decreaseInjectionVol: 0.05,
+                decreaseVialConcentration: 1,
+                decreaseBottleNumber: 1,
+            },
+            vialTestReactionAdjustment: {
+                whealLevelForAdjustment: 11,
+                action: 'Decrease Injection Volume',
+                decreaseInjectionVol: 0.05,
+                decreaseVialConcentration: 1,
+                decreaseBottleNumber: 1,
+            },
+            missedDoseAdjustment: [{
+                daysMissed: 10,
+                action: 'Decrease Injection Volume',
+                decreaseInjectionVol: 0.05,
+                decreaseVialConcentration: 1,
+                decreaseBottleNumber: 1,
+            }],
+        })
+        let savedProtocol = await defaultProtocol.save();
+
+        return res.status(201).json(savedPractice);
     } catch (error) {
-        return res.status(400).json({ message: error.message });
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+exports.updatePractice = async (req, res) => {
+    try {
+        let id = req.params.id;
+
+        console.log(req.body);
+        let query = {_id: id};
+        let newPractice = await practice.findOneAndUpdate(query, req.body, {new: true});
+
+        if (!newPractice) {
+            return res.status(400).json({ message: "Protocol not found"});
+        }
+        console.log(newPractice);
+        return res.status(200).json({ practice: newPractice });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
     }
 }
 
@@ -25,7 +94,7 @@ exports.getAllPractices = async (req, res) => {
         console.log('200');
     }
     catch (e) {
-        return res.status(400).json({message: 'Error retrieving practices'});
+        return res.status(500).json({message: 'Error retrieving practices'});
     }
 }
 
@@ -40,7 +109,7 @@ exports.getPractice = async (req, res) => {
 
         return res.status(200).json(practiceAcc);
     } catch (err) {
-        return res.status(400).json({ message: "Error retrieving practice" });
+        return res.status(500).json({ message: "Error retrieving practice" });
     }
 }
 
@@ -55,7 +124,7 @@ exports.getPracticeByName = async (req, res) => {
 
         return res.status(200).json(practiceAcc);
     } catch (err) {
-        return res.status(400).json({ message: "Error retrieving practice" });
+        return res.status(500).json({ message: "Error retrieving practice" });
     }
 }
 
@@ -70,7 +139,7 @@ exports.getPracticeByCode = async (req, res) => {
 
         return res.status(200).json(practiceAcc);
     } catch (err) {
-        return res.status(400).json({ message: "Error retrieving practice" });
+        return res.status(500).json({ message: "Error retrieving practice" });
     }
 }
 
@@ -87,7 +156,7 @@ exports.deletePractice = async (req, res) => {
         return res.status(200).json({ message: `Document with ${practiceName} has been deleted..` });
     }
     catch (error) {
-        return res.status(400).json({ message: error.message })
+        return res.status(500).json({ message: error.message })
     }
 }
 
@@ -103,7 +172,7 @@ exports.getLocation = async (req, res) => {
         return res.json(practiceExtract.practiceAddress);
 
     } catch (error) {
-        return res.status(400).json({ message: error.message });
+        return res.status(500).json({ message: error.message });
     }
 }
 
@@ -152,7 +221,7 @@ exports.uploadLogo = async (req, res) => {
             return res.status(200).json({ message: "Image uploaded."});
         });
     } catch (error) {
-        return res.status(400).json({ message: `Error w/ multer: ${error}`})
+        return res.status(500).json({ message: `Error w/ multer: ${error}`})
     }
 }
 
@@ -190,6 +259,6 @@ exports.getAntigensTested = async (req, res) => {
         return res.json(practiceExtract.antigensTested);
 
     } catch (error) {
-        return res.status(400).json({ message: error.message });
+        return res.status(500).json({ message: error.message });
     }
 }
