@@ -3,8 +3,7 @@ import { View, Text, TextInput, Dimensions, StyleSheet, TouchableOpacity } from 
 import axios from 'axios';
 
 
-export default function ProviderSignUpScreen() {
-  var success = true;
+export default function ProviderSignUpScreen({navigation}) {
   const [display, setDisplay] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -15,7 +14,7 @@ export default function ProviderSignUpScreen() {
   const [practiceCode, setPracticeCode] = useState('');
 
   const handleSignUp = async () => {
-
+    var success = true;
     if (firstName && lastName && email && password && confirmPass && NPI && practiceCode) { 
       
       // Check password complexity
@@ -63,7 +62,7 @@ export default function ProviderSignUpScreen() {
     if (success) {
       setDisplay('Account successfully created! Returning to sign in screen...');
       setTimeout(() => {
-        navigation.navigate('SignIn');
+        navigation.navigate('ProviderSignInScreen');
       }, 1000);
     }
   }

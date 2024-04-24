@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Dimensions, StyleSheet, TouchableOpacity } from 'react-native';
 import axios from 'axios';
 
-export default function PatientSignUpScreen() {
-  var success = true;
+export default function PatientSignUpScreen({navigation}) {
   var pracID = "";
   const [display, setDisplay] = useState('');
   const [firstName, setFirstName] = useState('');
@@ -12,7 +11,6 @@ export default function PatientSignUpScreen() {
   const [password, setPassword] = useState('');
   const [confirmPass, setConfirmPass] = useState('');
   const [practiceCode, setPracticeCode] = useState('');
-  //const [pracID, setPracID] = useState('');
   const [height, setHeight] = useState('');
   const [weight, setWeight] = useState('');
   const [DoB, setDob] = useState('');
@@ -27,20 +25,10 @@ export default function PatientSignUpScreen() {
   };
 
   const handleSignUp = async () => {
-
+    var success = true;
     setDisplay('')
-    if (firstName && lastName && email && password && confirmPass) {
+    if (firstName && lastName && email && phone && practiceCode && height && weight && password && confirmPass) {
 
-      const practice = await axios.get(`http://192.168.86.25:5000/api/practiceByCode/${practiceCode}`);
-
-      const practiceID = practice.data._id;
-      pracID = practiceID;
-      
-      if (!practiceID) {
-        setDisplay('Invalid Practice Code');
-        success = false;
-        return;
-      }
       // Check password complexity
       if (password.length < 12 || !/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/\d/.test(password) || !/[^A-Za-z0-9]/.test(password)) {
         setDisplay('Password must be at least 12 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.');
@@ -54,11 +42,11 @@ export default function PatientSignUpScreen() {
             lastName,
             email,
             password,
-            practiceID,
             phone,
             height,
             weight,
             DoB,
+            practiceCode
           }
 
           if (!isNumeric(height)) {
@@ -77,15 +65,13 @@ export default function PatientSignUpScreen() {
             return;
           }
 
-          const emailExists = await axios.post('http://192.168.86.25:5000/api/checkEmail', { email });
+          const response = await axios.post(`${process.env.EXPO_PUBLIC_BACKEND_URL}:${process.env.EXPO_PUBLIC_BACKEND_PORT}/api/addPatient`, data);
+          console.log(response);
 
-          if (emailExists.status === 200) {
-            const response = await axios.post('http://192.168.86.25:5000/api/addPatient', data);
-            console.log(response);
-          }
-          else if (emailExists.status === 201) {
-            setDisplay('This email is already associated with an account!');
+          if (response.status != 201) {
+            setDisplay(response.data.message);
             success = false;
+            return;
           }
 
         }
@@ -98,36 +84,36 @@ export default function PatientSignUpScreen() {
         setDisplay('Passwords do not match!');
         success = false;
       }
-    }
-    else {
-      setDisplay('Please fill out all fields!');
-      success = false;
-    }
-    if (success) {
-      // Add initial blank treatment to account to be used in calculations
-      const patient = await axios.get(`http://192.168.86.25:5000/api/findPatient/${email}`)
-      const pID = patient.data._id
+  }
+  else {
+    setDisplay('Please fill out all fields!');
+    success = false;
+  }
+  if (success) {
+    // Add initial blank treatment to account to be used in calculations
+    // const patient = await axios.get(`http://192.168.86.25:5000/api/findPatient/${email}`)
+    // const pID = patient.data._id
 
-      console.log(pID);
-      console.log(pracID);
+    // console.log(pID);
+    // console.log(pracID);
 
-      const toAdd = {
-        patientLastName: lastName,
-        patientFirstName: firstName,
-        patientID: pID,
-        date: new Date().setHours(0,0,0,0),
-        practiceID: pracID
-      }
+    // const toAdd = {
+    //   patientLastName: lastName,
+    //   patientFirstName: firstName,
+    //   patientID: pID,
+    //   date: new Date().setHours(0,0,0,0),
+    //   practiceID: pracID
+    // }
 
-      const addingTreatment = await axios.post(`http://192.168.86.25:5000/api/addTreatment`, toAdd)
+    // const addingTreatment = await axios.post(`http://192.168.86.25:5000/api/addTreatment`, toAdd)
 
 
 
-      setDisplay('Account successfully created! Returning to sign in screen...');
-      setTimeout(() => {
-        navigation.navigate('SignIn');
-      }, 1000);
-    }
+    setDisplay('Account successfully created! Returning to sign in screen...');
+    setTimeout(() => {
+      navigation.navigate('InitialMobileScreen');
+    }, 1000);
+  }
   }
 
   return (

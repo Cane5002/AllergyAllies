@@ -2,14 +2,10 @@ import * as React from 'react';
 import { StyleSheet, Platform} from 'react-native'
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import Portal from './screens/PatientScreens/Portal.js';
-import Injections from './screens/Injection/Injections.js';
-import Maintenance from './screens/Injection/MaintenanceBottleNum.js';
 import LoadingScreen from './screens/LoadingScreen.js';
 import PatientSignUpScreen from './screens/signup/PatientSignUpScreen';
 import PatientHome from './screens/PatientScreens/PatientHome.js';
 import Upcoming from './screens/PatientScreens/Upcoming.js';
-import InitialScreen from './screens/InitialScreen.js';
 import AuthContext from './AuthContext';
 
 import ViewAllAppointments from './screens/PatientScreens/ViewAllAppointments.js';
@@ -57,16 +53,16 @@ const InitialMobileStack = (
       }}
     />
     <Stack.Screen
-              name="PatientSignUpScreen"
-              component={PatientSignUpScreen}
-              options={{
-                title: 'Patient Sign Up',
-                headerBackTitleVisible: false,
-                headerTitleAlign: 'center',
-                headerTitleStyle: {textAlign: 'center'},
-                //animationTypeForReplace: state.isSignout ? 'pop' : 'push',
-              }}
-            />
+      name="PatientSignUpScreen"
+      component={PatientSignUpScreen}
+      options={{
+        title: 'Patient Sign Up',
+        headerBackTitleVisible: false,
+        headerTitleAlign: 'center',
+        headerTitleStyle: {textAlign: 'center'},
+        //animationTypeForReplace: state.isSignout ? 'pop' : 'push',
+      }}
+    />
     {/* Add other mobile-specific screens here */}
   </>
 );
@@ -76,7 +72,7 @@ const SignedInMobileStack = (
       <Stack.Screen name="PatientHome" component={PatientHome} options={{title: 'AllergyAlly'}} />
       <Stack.Screen name="Upcoming" component={Upcoming} options={{title: 'Upcoming Appointment', headerBackTitleVisible: false}} />
       <Stack.Screen name="PatientSignUpScreen" component={PatientSignUpScreen} options={{title: 'Patient Sign Up'}} />
-      <Stack.Screen name= "ViewAllAppointments" component={ViewAllAppointments} options={{title: 'AllergyAlly', headerBackTitleVisible: false}} />
+      <Stack.Screen name="ViewAllAppointments" component={ViewAllAppointments} options={{title: 'AllergyAlly', headerBackTitleVisible: false}} />
       <Stack.Screen name="InjectionInfo" component={InjectionInfo} options={{title: 'AllergyAlly', headerBackTitleVisible: false}} />
       <Stack.Screen name="EditCurrentMedications" component={EditCurrentMedications} options={{title: 'AllergyAlly', headerBackTitleVisible: false}} />
      
@@ -87,8 +83,6 @@ const SignedInMobileStack = (
 //PatientAppointments: the patient home screen
 
 export default function App({navigation}) {
-
-  const isDesktop = Platform.OS === 'web';
   
   const initialState = {
     isLoading: true,
